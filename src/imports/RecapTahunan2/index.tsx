@@ -1,7 +1,17 @@
 import { useState } from 'react';
 import svgPaths from './svg-we4zx2xl8u';
 
-export default function RecapTahunan({ onConfirm }: { onConfirm?: () => void }) {
+export default function RecapTahunan({
+  onConfirm,
+  onBack,
+  onDashboard,
+  onRecap,
+}: {
+  onConfirm?: () => void;
+  onBack?: () => void;
+  onDashboard?: () => void;
+  onRecap?: () => void;
+}) {
   const [selectedYear, setSelectedYear] = useState(2026);
   const years = [2021, 2022, 2023, 2024, 2025, 2026];
   const currentYearIndex = years.indexOf(selectedYear);
@@ -14,9 +24,9 @@ export default function RecapTahunan({ onConfirm }: { onConfirm?: () => void }) 
   };
 
   return (
-    <div className="bg-[#fdfdff] min-h-screen w-full max-w-md mx-auto p-6 relative">
+    <div className="bg-[#fdfdff] absolute inset-0 w-full h-full p-6 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-center mb-8 relative">
+      <div className="flex items-center justify-center mb-8 relative" style={{ marginTop: "60px" }}>
         <h1 className="text-[#8869F5] font-bold text-sm">Pilih Tahun</h1>
       </div>
 
@@ -70,7 +80,7 @@ export default function RecapTahunan({ onConfirm }: { onConfirm?: () => void }) 
       </div>
 
       {/* Tips Section */}
-      <div className="bg-[#f3f0fe] rounded-[20px] p-4 mb-24">
+      <div className="bg-[#f3f0fe] rounded-[20px] p-4 mb-24" style={{ marginTop: "20px" }}>
         <div className="flex items-start gap-3">
           <div className="mt-0.5">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 15 15">
@@ -93,17 +103,20 @@ export default function RecapTahunan({ onConfirm }: { onConfirm?: () => void }) 
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-6">
+      {/* Bottom Navigation - Absolute to stay inside the white phone frame */}
+      <div className="absolute bottom-6 left-6 right-6">
         <div className="bg-white rounded-[15px] shadow-[0px_0px_7px_1px_#ede8ff] py-3 px-6 flex items-center justify-between relative">
-          <button className="flex flex-col items-center gap-1">
+          <button
+            onClick={onDashboard}
+            className="flex flex-col items-center gap-1 cursor-pointer"
+          >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 14 15">
               <path d={svgPaths.p5c0c040} fill="#C0C0C0" />
             </svg>
             <span className="text-[#c0c0c0] text-[8px] font-bold">Dashboard</span>
           </button>
 
-          <div className="absolute left-1/2 -translate-x-1/2 -top-6">
+          <div className="absolute left-1/2 -translate-x-1/2 -top-6 pointer-events-none">
             <div className="bg-white rounded-full p-1 shadow-[0px_0px_4px_0px_rgba(180,159,255,1)]">
               <div className="bg-[#8869F5] rounded-full w-[53px] h-[53px] flex items-center justify-center">
                 <svg className="w-[19px] h-[19px]" fill="none" viewBox="0 0 20 20">
@@ -113,7 +126,10 @@ export default function RecapTahunan({ onConfirm }: { onConfirm?: () => void }) 
             </div>
           </div>
 
-          <button className="flex flex-col items-center gap-1">
+          <button
+            onClick={onRecap}
+            className="flex flex-col items-center gap-1 cursor-pointer"
+          >
             <div className="relative">
               <svg className="w-4 h-4" viewBox="0 0 14 15">
                 <path d={svgPaths.p289ce400} stroke="#8869F5" strokeLinecap="square" strokeWidth="2" fill="none" />

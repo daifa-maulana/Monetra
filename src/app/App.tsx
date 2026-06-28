@@ -30,6 +30,7 @@ type Page =
 
 export default function App() {
   const [page, setPage] = useState<Page>("splash");
+  const [openAddExpenseOnLoad, setOpenAddExpenseOnLoad] = useState(false);
 
   return (
     <>
@@ -67,12 +68,19 @@ export default function App() {
         <DashboardPage
           onLogout={() => setPage("login")}
           onRecap={() => setPage("recap-harian")}
+          openAddExpense={openAddExpenseOnLoad}
+          onAddExpenseOpenComplete={() => setOpenAddExpenseOnLoad(false)}
         />
       )}
 
       {page === "recap-harian" && (
         <RecapHarianPage
           onBack={() => setPage("dashboard")}
+          onDashboard={() => setPage("dashboard")}
+          onAddExpense={() => {
+            setPage("dashboard");
+            setOpenAddExpenseOnLoad(true);
+          }}
           onTabChange={(tab) =>
             setPage(tab === "bulanan" ? "recap-bulanan" : "recap-tahunan")
           }
@@ -81,6 +89,11 @@ export default function App() {
       {page === "recap-bulanan" && (
         <RecapBulananPage
           onBack={() => setPage("dashboard")}
+          onDashboard={() => setPage("dashboard")}
+          onAddExpense={() => {
+            setPage("dashboard");
+            setOpenAddExpenseOnLoad(true);
+          }}
           onTabChange={(tab) =>
             setPage(tab === "harian" ? "recap-harian" : "recap-tahunan")
           }
@@ -89,6 +102,11 @@ export default function App() {
       {page === "recap-tahunan" && (
         <RecapTahunanPage
           onBack={() => setPage("dashboard")}
+          onDashboard={() => setPage("dashboard")}
+          onAddExpense={() => {
+            setPage("dashboard");
+            setOpenAddExpenseOnLoad(true);
+          }}
           onTabChange={(tab) =>
             setPage(tab === "harian" ? "recap-harian" : "recap-bulanan")
           }

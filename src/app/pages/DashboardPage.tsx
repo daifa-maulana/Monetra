@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   UtensilsCrossed, Bus, Receipt, Zap, GraduationCap, Heart,
   Smartphone, Gamepad2, Sparkles, MoreHorizontal, Plus,
@@ -33,7 +33,17 @@ type Category = {
   bg: string;
 };
 
-export default function DashboardPage({ onLogout, onRecap }: { onLogout: () => void; onRecap: () => void; }) {
+export default function DashboardPage({
+  onLogout,
+  onRecap,
+  openAddExpense,
+  onAddExpenseOpenComplete,
+}: {
+  onLogout: () => void;
+  onRecap: () => void;
+  openAddExpense?: boolean;
+  onAddExpenseOpenComplete?: () => void;
+}) {
   const [activeTab, setActiveTab] = useState<"dashboard" | "recap">("dashboard");
   const [cardSlide, setCardSlide] = useState(0);
   const [showLogout, setShowLogout] = useState(false);
@@ -43,6 +53,13 @@ export default function DashboardPage({ onLogout, onRecap }: { onLogout: () => v
   const [selectedCategory, setSelectedCategory] = useState<Category>(CATEGORIES[0]);
   const totalSlides = 2;
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (openAddExpense) {
+      setShowInputPengeluaran(true);
+      onAddExpenseOpenComplete?.();
+    }
+  }, [openAddExpense, onAddExpenseOpenComplete]);
 
   const [profileName, setProfileName] = useState("Muja Karamoy");
   const [profileEmail, setProfileEmail] = useState("kelompok1@gmail.com");
@@ -395,15 +412,14 @@ export default function DashboardPage({ onLogout, onRecap }: { onLogout: () => v
         {showInputPengeluaran && (
           <div className="absolute inset-0 z-50" style={{ borderRadius: "inherit" }}>
             <div className="absolute inset-0" style={{ borderRadius: "inherit", overflow: "hidden" }}>
-              <InputPengeluaran />
+              <InputPengeluaran
+                onClose={() => setShowInputPengeluaran(false)}
+                onRecap={() => {
+                  setShowInputPengeluaran(false);
+                  onRecap();
+                }}
+              />
             </div>
-            <button
-              onClick={() => setShowInputPengeluaran(false)}
-              className="absolute top-4 right-4 z-50 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"
-              aria-label="Tutup"
-            >
-              <X size={16} className="text-white" />
-            </button>
           </div>
         )}
 

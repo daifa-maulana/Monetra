@@ -624,7 +624,7 @@ function Group33() {
   );
 }
 
-export default function InputPengeluaran() {
+export default function InputPengeluaran({ onClose, onRecap }: { onClose?: () => void; onRecap?: () => void }) {
   const [showKeypad, setShowKeypad] = useState(false);
   const [category, setCategory] = useState("");
   const [showCategorySheet, setShowCategorySheet] = useState(false);
@@ -639,6 +639,11 @@ export default function InputPengeluaran() {
         <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0px_10px_4px_0px_rgba(0,0,0,0.01)]" />
       </div>
       <Group11 />
+      {/* Back button overlay */}
+      <button
+        style={{ position: "absolute", zIndex: 20, left: 30, top: 85, width: 30, height: 30, borderRadius: "50%", background: "transparent", border: "none", cursor: "pointer" }}
+        onClick={onClose}
+      />
       <div className="absolute bg-white h-[161px] left-0 rounded-[30px] top-[205px] w-[393px]" />
       {/* Jumlah Pengeluaran box — clickable to toggle keypad */}
       <div onClick={() => setShowKeypad(v => !v)} className="cursor-pointer">
@@ -677,6 +682,15 @@ export default function InputPengeluaran() {
         />
       )}
       <Group31 />
+      {/* Navbar overlays inside the modal */}
+      <button
+        style={{ position: "absolute", zIndex: 20, left: 22, top: 788, width: 150, height: 49, background: "transparent", border: "none", cursor: "pointer" }}
+        onClick={onClose}
+      />
+      <button
+        style={{ position: "absolute", zIndex: 20, left: 220, top: 788, width: 150, height: 49, background: "transparent", border: "none", cursor: "pointer" }}
+        onClick={onRecap}
+      />
       {showKeypad && <Group13 />}
       <div className="absolute h-[392px] left-[29px] top-[431px] w-[335px]" data-name="1">
         <Group30 />
