@@ -33,15 +33,14 @@ export default function App() {
   const [page, setPage] = useState<Page>("splash");
   const [openAddExpenseOnLoad, setOpenAddExpenseOnLoad] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [targetPageAfterSplash, setTargetPageAfterSplash] = useState<Page>("login");
 
   useEffect(() => {
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUserId(session.user.id);
-        if (page === "splash" || page === "login") {
-          setPage("dashboard");
-        }
+        setTargetPageAfterSplash("dashboard");
       }
     });
 
@@ -49,10 +48,22 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUserId(session.user.id);
-        setPage("dashboard");
+        setPage((current) => {
+          if (current === "splash") {
+            setTargetPageAfterSplash("dashboard");
+            return "splash";
+          }
+          return "dashboard";
+        });
       } else {
         setUserId(null);
-        setPage("login");
+        setPage((current) => {
+          if (current === "splash") {
+            setTargetPageAfterSplash("login");
+            return "splash";
+          }
+          return "login";
+        });
       }
     });
 
@@ -63,7 +74,7 @@ export default function App() {
 
   return (
     <>
-      {page === "splash" && <SplashPage onDone={() => setPage("login")} />}
+      {page === "splash" && <SplashPage onDone={() => setPage(targetPageAfterSplash)} />}
       {page === "login" && (
         <LoginPage
           onDaftar={() => setPage("buat-akun")}

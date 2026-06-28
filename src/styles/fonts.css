@@ -1,1 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap');
+
+.font-baloo {
+  font-family: 'Baloo 2', 'Baloo Bhai 2', 'Baloo', cursive, sans-serif !important;
+}

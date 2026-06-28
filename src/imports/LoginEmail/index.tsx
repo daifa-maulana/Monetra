@@ -10,7 +10,7 @@ function Logo() {
           <img alt="" className="absolute h-[299.57%] left-[-50.54%] max-w-none top-[-95.25%] w-[800%]" src={imgLogo1} />
         </div>
       </div>
-      <p className="[word-break:break-word] absolute bg-clip-text bg-gradient-to-r font-['Baloo:Regular',sans-serif] from-[#8b5bc5] h-[76px] leading-[normal] left-[139px] not-italic text-[50px] text-[transparent] to-[#fb9b44] top-[128px] via-1/2 via-[#eb7f9e] w-[203px]">Monetra</p>
+      <p className="[word-break:break-word] absolute h-[76px] leading-[normal] left-[139px] not-italic text-[50px] top-[128px] w-[203px]" style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, background: "linear-gradient(to right, #8b5bc5, #eb7f9e 50%, #fb9b44)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Monetra</p>
     </div>
   );
 }
