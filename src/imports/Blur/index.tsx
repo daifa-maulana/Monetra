@@ -71,7 +71,9 @@ function NumpadKey({ label, onPress }: { label: string; onPress: (k: string) => 
   );
 }
 
-function InputForm({ onClose, category }: { onClose?: () => void; category?: CategoryProp }) {
+import { supabase } from "@/lib/supabase";
+
+function InputForm({ onClose, category, userId }: { onClose?: () => void; category?: CategoryProp; userId?: string }) {
   const CatIcon = category?.icon;
   const catLabel = category?.label ?? "Makan/minum";
   const catColor = category?.color ?? "#73CD6C";
@@ -79,8 +81,8 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
 
   const [rawAmount, setRawAmount] = useState("");
   const [note, setNote] = useState("");
-  // keypad hanya muncul saat user klik kolom jumlah pengeluaran
   const [showKeypad, setShowKeypad] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   function handleKey(k: string) {
     if (k === "⌫") { setRawAmount((p) => p.slice(0, -1)); return; }
@@ -93,6 +95,52 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
   }
 
   const displayAmount = formatDisplay(rawAmount);
+
+  const handleSave = async () => {
+    if (!rawAmount || !userId) return;
+    const amountNum = parseFloat(rawAmount);
+    if (isNaN(amountNum) || amountNum <= 0) return;
+
+    try {
+      setSaving(true);
+      
+      // Get rekening_id
+      const { data: rekData } = await supabase
+        .from("rekening")
+        .select("id")
+        .eq("user_id", userId)
+        .limit(1);
+      const rekeningId = rekData?.[0]?.id || null;
+
+      // Get kategori_id
+      // Let's resolve by name. The mockup has names like Makan/minum, Transportasi
+      // Let's check with case-insensitive or exact match
+      const { data: catData } = await supabase
+        .from("kategori")
+        .select("id")
+        .eq("nama", catLabel)
+        .limit(1);
+      const kategoriId = catData?.[0]?.id || null;
+
+      // Insert transaction
+      const { error } = await supabase.from("transaksi").insert({
+        user_id: userId,
+        rekening_id: rekeningId,
+        kategori_id: kategoriId,
+        jumlah: amountNum,
+        catatan: note || null,
+        tanggal: new Date().toISOString().split("T")[0],
+      });
+
+      if (error) throw error;
+      onClose?.();
+    } catch (err) {
+      console.error("Error saving instant transaction:", err);
+      alert("Gagal menyimpan transaksi");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     // Sheet: posisi absolute dari bawah, tinggi max sudah dibatasi parent 852px
@@ -138,7 +186,7 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
         <button onClick={onClose} style={{
           background: "none", border: "none", cursor: "pointer",
           padding: 4, color: "rgba(0,0,0,0.4)", display: "flex", borderRadius: "50%",
-        }}>
+        }} disabled={saving}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
@@ -173,6 +221,7 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
             transition: "border-color 0.2s",
             boxShadow: showKeypad ? "0 0 0 3px rgba(136,105,245,0.11)" : "none",
           }}
+          disabled={saving}
         >
           <span style={{ fontWeight: 700, fontSize: 15, color: "#7459d0" }}>Rp</span>
           <span style={{
@@ -218,6 +267,7 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
             e.currentTarget.style.borderColor = PURPLE;
           }}
           onBlur={(e) => { e.currentTarget.style.borderColor = "#E8E1FF"; }}
+          disabled={saving}
         />
       </div>
 
@@ -237,19 +287,20 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
             </div>
           ))}
           <button
-            onClick={() => { if (rawAmount) onClose?.(); }}
+            onClick={handleSave}
             style={{
               marginTop: 2, height: 44, borderRadius: 12, border: "none",
-              background: rawAmount ? PURPLE : PURPLE_LIGHT,
-              color: rawAmount ? "white" : "#BBA8F5",
+              background: rawAmount && !saving ? PURPLE : PURPLE_LIGHT,
+              color: rawAmount && !saving ? "white" : "#BBA8F5",
               fontWeight: 700, fontSize: 13,
-              cursor: rawAmount ? "pointer" : "default",
+              cursor: rawAmount && !saving ? "pointer" : "default",
               fontFamily: "inherit",
               transition: "background 0.2s, color 0.2s",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
             }}
+            disabled={!rawAmount || saving}
           >
-            Simpan Pengeluaran
+            {saving ? "Menyimpan..." : "Simpan Pengeluaran"}
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
               <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -261,19 +312,20 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
       {!showKeypad && (
         <div style={{ padding: "0 14px 16px", flexShrink: 0 }}>
           <button
-            onClick={() => { if (rawAmount) onClose?.(); }}
+            onClick={handleSave}
             style={{
               width: "100%", height: 44, borderRadius: 12, border: "none",
-              background: rawAmount ? PURPLE : PURPLE_LIGHT,
-              color: rawAmount ? "white" : "#BBA8F5",
+              background: rawAmount && !saving ? PURPLE : PURPLE_LIGHT,
+              color: rawAmount && !saving ? "white" : "#BBA8F5",
               fontWeight: 700, fontSize: 13,
-              cursor: rawAmount ? "pointer" : "default",
+              cursor: rawAmount && !saving ? "pointer" : "default",
               fontFamily: "inherit",
               transition: "background 0.2s, color 0.2s",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
             }}
+            disabled={!rawAmount || saving}
           >
-            Simpan Pengeluaran
+            {saving ? "Menyimpan..." : "Simpan Pengeluaran"}
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
               <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -284,7 +336,7 @@ function InputForm({ onClose, category }: { onClose?: () => void; category?: Cat
   );
 }
 
-export default function Blur({ onClose, category }: { onClose?: () => void; category?: CategoryProp }) {
+export default function Blur({ onClose, category, userId }: { onClose?: () => void; category?: CategoryProp; userId?: string }) {
   return (
     // Ikuti ukuran parent phone frame (393×852) dari App.tsx
     <div style={{
@@ -362,7 +414,7 @@ export default function Blur({ onClose, category }: { onClose?: () => void; cate
       }} />
 
       {/* Input form sheet */}
-      <InputForm onClose={onClose} category={category} />
+      <InputForm onClose={onClose} category={category} userId={userId} />
     </div>
   );
 }

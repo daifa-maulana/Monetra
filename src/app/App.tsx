@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 // Modular Page Imports
 import SplashPage from "./pages/SplashPage";
@@ -31,6 +32,34 @@ type Page =
 export default function App() {
   const [page, setPage] = useState<Page>("splash");
   const [openAddExpenseOnLoad, setOpenAddExpenseOnLoad] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUserId(session.user.id);
+        if (page === "splash" || page === "login") {
+          setPage("dashboard");
+        }
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUserId(session.user.id);
+        setPage("dashboard");
+      } else {
+        setUserId(null);
+        setPage("login");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <>
@@ -66,6 +95,7 @@ export default function App() {
 
       {page === "dashboard" && (
         <DashboardPage
+          userId={userId || ""}
           onLogout={() => setPage("login")}
           onRecap={() => setPage("recap-harian")}
           openAddExpense={openAddExpenseOnLoad}
@@ -75,6 +105,7 @@ export default function App() {
 
       {page === "recap-harian" && (
         <RecapHarianPage
+          userId={userId || ""}
           onBack={() => setPage("dashboard")}
           onDashboard={() => setPage("dashboard")}
           onAddExpense={() => {
@@ -88,6 +119,7 @@ export default function App() {
       )}
       {page === "recap-bulanan" && (
         <RecapBulananPage
+          userId={userId || ""}
           onBack={() => setPage("dashboard")}
           onDashboard={() => setPage("dashboard")}
           onAddExpense={() => {
@@ -101,6 +133,7 @@ export default function App() {
       )}
       {page === "recap-tahunan" && (
         <RecapTahunanPage
+          userId={userId || ""}
           onBack={() => setPage("dashboard")}
           onDashboard={() => setPage("dashboard")}
           onAddExpense={() => {

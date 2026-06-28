@@ -12,6 +12,9 @@ import imgEmoji from "@/imports/Awal/c7114843781c63f9bbda7f363d43c9f3e397e718.pn
 import imgWallet2 from "@/imports/Saldo3/b919fe9e06545fa2c3d9cd48bbf119c63749fcb4.png";
 import InputInstan from "@/imports/Blur";
 import InputPengeluaran from "@/imports/InputPengeluaran/index";
+import { supabase } from "@/lib/supabase";
+import { getProfile } from "@/lib/services/profile";
+import { getOrCreateRekening } from "@/lib/services/rekening";
 
 const CATEGORIES = [
   { label: "Makan/minum", icon: UtensilsCrossed, color: "#73CD6C", bg: "#E4F2E3" },
@@ -33,12 +36,18 @@ type Category = {
   bg: string;
 };
 
+const PATH_DASHBOARD = "M0 13.2857V5.57143C0 5.3 0.0621248 5.04286 0.186375 4.8C0.310625 4.55714 0.481833 4.35714 0.7 4.2L5.95 0.342857C6.25625 0.114286 6.60625 0 7 0C7.39375 0 7.74375 0.114286 8.05 0.342857L13.3 4.2C13.5187 4.35714 13.6902 4.55714 13.8145 4.8C13.9387 5.04286 14.0006 5.3 14 5.57143V13.2857C14 13.7571 13.8285 14.1609 13.4855 14.4969C13.1425 14.8329 12.7307 15.0006 12.25 15H9.625C9.37708 15 9.16941 14.9177 9.002 14.7531C8.83458 14.5886 8.75058 14.3851 8.75 14.1429V9.85714C8.75 9.61428 8.666 9.41085 8.498 9.24685C8.33 9.08285 8.12233 9.00057 7.875 9H6.125C5.87708 9 5.66942 9.08228 5.502 9.24685C5.33458 9.41143 5.25058 9.61485 5.25 9.85714V14.1429C5.25 14.3857 5.166 14.5894 4.998 14.754C4.83 14.9186 4.62233 15.0006 4.375 15H1.75C1.26875 15 0.856916 14.8323 0.5145 14.4969C0.172083 14.1614 0.000583333 13.7577 0 13.2857Z";
+const PATH_RECAP_1 = "M4.5493 6.5761H8.09859M4.5493 9.73399H10.8592M4.5493 12.8919H8.49296M14.4085 9.73399V17.234H1V2.23399H8.09859";
+const PATH_RECAP_2 = "M13.2253 2.43152L13.7774 3.6552L15 4.20783L13.7774 4.76046L13.2253 5.98415L12.6732 4.76046L11.4507 4.20783L12.6732 3.6552L13.2253 2.43152Z";
+
 export default function DashboardPage({
+  userId,
   onLogout,
   onRecap,
   openAddExpense,
   onAddExpenseOpenComplete,
 }: {
+  userId: string;
   onLogout: () => void;
   onRecap: () => void;
   openAddExpense?: boolean;
@@ -67,6 +76,40 @@ export default function DashboardPage({
   const [editName, setEditName] = useState(profileName);
   const [editEmail, setEditEmail] = useState(profileEmail);
   const [editPhoto, setEditPhoto] = useState<string | null>(null);
+  const [saldo, setSaldo] = useState<number | null>(null);
+  const [totalPengeluaran, setTotalPengeluaran] = useState<number>(0);
+
+  // Load profile and saldo from Supabase on mount
+  const loadData = async () => {
+    if (!userId) return;
+    const [profile, rekening] = await Promise.all([
+      getProfile(userId),
+      getOrCreateRekening(userId),
+    ]);
+    if (profile) {
+      setProfileName(profile.nama || "Pengguna");
+      setProfileEmail(profile.email || "");
+      setProfilePhoto(profile.foto_url || null);
+    }
+    if (rekening) {
+      setSaldo(rekening.saldo);
+    }
+    // Load total pengeluaran bulan ini
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+    const { data: txData } = await supabase
+      .from("transaksi")
+      .select("jumlah")
+      .eq("user_id", userId)
+      .gte("tanggal", firstDay)
+      .lte("tanggal", lastDay);
+    if (txData) {
+      setTotalPengeluaran(txData.reduce((sum, t) => sum + (t.jumlah || 0), 0));
+    }
+  };
+
+  useEffect(() => { loadData(); }, [userId]);
 
   const openEditProfile = () => {
     setEditName(profileName);
@@ -76,11 +119,24 @@ export default function DashboardPage({
     setShowEditProfile(true);
   };
 
-  const saveEditProfile = () => {
+  const saveEditProfile = async () => {
     setProfileName(editName);
     setProfileEmail(editEmail);
     setProfilePhoto(editPhoto);
     setShowEditProfile(false);
+    // Save to Supabase
+    if (userId) {
+      await supabase.from("profiles").update({
+        nama: editName,
+        email: editEmail,
+        foto_url: editPhoto,
+      }).eq("id", userId);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onLogout();
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,6 +147,9 @@ export default function DashboardPage({
       reader.readAsDataURL(file);
     }
   };
+
+  const formatSaldo = (n: number) =>
+    "Rp " + n.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const handleDragEnd = (e: React.TouchEvent | React.MouseEvent, startX: number) => {
     const endX = "changedTouches" in e ? e.changedTouches[0].clientX : (e as React.MouseEvent).clientX;
@@ -147,7 +206,7 @@ export default function DashboardPage({
                         Edit Profile
                       </button>
                       <button
-                        onClick={() => { setShowLogout(false); onLogout(); }}
+                        onClick={() => { setShowLogout(false); handleLogout(); }}
                         className="w-full border border-red-500 rounded-[7px] py-2 text-[13px] font-bold text-red-500 hover:bg-red-50 transition-colors"
                       >
                         Logout
@@ -185,8 +244,12 @@ export default function DashboardPage({
                       >
                         <div className="px-5 pt-5 pb-3 pr-40">
                           <p className="text-white/90 text-[11px] font-medium">Total Saldo</p>
-                          <p className="text-white font-bold text-[28px] mt-2 leading-none">Rp 0.00</p>
-                          <p className="text-white/70 text-[11px] mt-3">Belum Ada Data Keuangan</p>
+                          <p className="text-white font-bold text-[28px] mt-2 leading-none">
+                            {saldo !== null ? formatSaldo(saldo) : "Memuat..."}
+                          </p>
+                          <p className="text-white/70 text-[11px] mt-3">
+                            {saldo !== null ? (saldo > 0 ? "Saldo rekening kamu" : "Belum Ada Saldo") : ""}
+                          </p>
                         </div>
                         <div className="mx-5 mb-4 mt-3">
                           <div className="bg-[#eae1fe] rounded-[15px] shadow-sm flex items-center justify-center gap-2 py-3 cursor-pointer">
@@ -212,9 +275,13 @@ export default function DashboardPage({
                         }}
                       >
                         <div className="px-5 pt-5 pb-3 pr-40">
-                          <p className="text-white/90 text-[11px] font-medium">Sisa Saldo Pengeluaran</p>
-                          <p className="text-white font-bold text-[28px] mt-2 leading-none">Rp 0.00</p>
-                          <p className="text-white/70 text-[11px] mt-3">Belum Ada Data Keuangan</p>
+                          <p className="text-white/90 text-[11px] font-medium">Total Pengeluaran Bulan Ini</p>
+                          <p className="text-white font-bold text-[28px] mt-2 leading-none">
+                            {formatSaldo(totalPengeluaran)}
+                          </p>
+                          <p className="text-white/70 text-[11px] mt-3">
+                            {new Date().toLocaleString("id-ID", { month: "long", year: "numeric" })}
+                          </p>
                         </div>
                         <div className="mx-5 mb-4 mt-3">
                           <div className="bg-[#eae1fe] rounded-[15px] shadow-sm flex items-center justify-center gap-2 py-3 cursor-pointer">
@@ -361,41 +428,48 @@ export default function DashboardPage({
         </div>
 
         {/* ── Bottom Navigation ── */}
-        <div className="bg-white/80 backdrop-blur-sm">
-          <div className="relative mx-6 mb-4 mt-2">
-            <div className="bg-white rounded-[15px] shadow-[0_0_7px_1px_#ede8ff] h-[49px] flex items-center px-6">
-              <button
-                className="flex-1 flex flex-col items-center gap-0.5"
-                onClick={() => setActiveTab("dashboard")}
-              >
-                <LayoutDashboard size={15} className={activeTab === "dashboard" ? "text-[#8869F5]" : "text-[#C0C0C0]"} />
-                <span className={`text-[8px] font-bold ${activeTab === "dashboard" ? "text-[#8869F5]" : "text-[#C0C0C0]"}`}>
-                  Dashboard
-                </span>
-                {activeTab === "dashboard" && <div className="w-[18px] h-[2px] bg-[#8869F5] rounded-full" />}
-              </button>
+        <div className="absolute bottom-6 left-6 right-6 z-40">
+          <div className="bg-white rounded-[15px] shadow-[0px_0px_7px_1px_#ede8ff] py-3 px-6 flex items-center justify-between relative h-[49px]">
+            {/* Dashboard Button */}
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className="flex flex-col items-center gap-1 cursor-pointer"
+              style={{ width: "80px" }}
+            >
+              <div className="relative flex flex-col items-center">
+                <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
+                  <path d={PATH_DASHBOARD} fill={activeTab === "dashboard" ? "#8869F5" : "#C0C0C0"} />
+                </svg>
+                {activeTab === "dashboard" && <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4.5 h-0.5 bg-[#8869F5] rounded-full"></div>}
+              </div>
+              <span className={`${activeTab === "dashboard" ? "text-[#8869F5]" : "text-[#C0C0C0]"} text-[8px] font-bold`}>Dashboard</span>
+            </button>
 
-              <div className="w-14" />
+            <div className="w-14" />
 
-              <button
-                className="flex-1 flex flex-col items-center gap-0.5"
-                onClick={() => { setActiveTab("recap"); onRecap(); }}
-              >
-                <FileText size={15} className={activeTab === "recap" ? "text-[#8869F5]" : "text-[#C0C0C0]"} />
-                <span className={`text-[8px] font-bold ${activeTab === "recap" ? "text-[#8869F5]" : "text-[#C0C0C0]"}`}>
-                  Recap
-                </span>
-                {activeTab === "recap" && <div className="w-[18px] h-[2px] bg-[#8869F5] rounded-full" />}
-              </button>
-            </div>
+            {/* Recap Button */}
+            <button
+              onClick={() => { setActiveTab("recap"); onRecap(); }}
+              className="flex flex-col items-center gap-1 cursor-pointer"
+              style={{ width: "80px" }}
+            >
+              <div className="relative flex flex-col items-center">
+                <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
+                  <path d={PATH_RECAP_1} stroke={activeTab === "recap" ? "#8869F5" : "#C0C0C0"} strokeLinecap="square" strokeWidth="2" />
+                  <path d={PATH_RECAP_2} stroke={activeTab === "recap" ? "#8869F5" : "#C0C0C0"} strokeWidth="2" />
+                </svg>
+                {activeTab === "recap" && <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4.5 h-0.5 bg-[#8869F5] rounded-full"></div>}
+              </div>
+              <span className={`${activeTab === "recap" ? "text-[#8869F5]" : "text-[#C0C0C0]"} text-[8px] font-bold`}>Recap</span>
+            </button>
+          </div>
 
-            {/* FAB */}
-            <div className="absolute left-1/2 -translate-x-1/2 -top-[13px]">
-              <div className="absolute inset-0 -m-[4px] rounded-full bg-white shadow-[0_0_8px_4px_rgba(136,105,245,0.3)]" />
-              <button className="relative w-[53px] h-[53px] bg-[#8869F5] rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" onClick={() => setShowInputPengeluaran(true)}>
-                <Plus size={22} className="text-[#E9EBF8]" strokeWidth={2.5} />
-              </button>
-            </div>
+          {/* FAB */}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-[13px] pointer-events-auto">
+            <div className="absolute inset-0 -m-[4px] rounded-full bg-white shadow-[0_0_8px_4px_rgba(136,105,245,0.3)]" />
+            <button className="relative w-[53px] h-[53px] bg-[#8869F5] rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform cursor-pointer" onClick={() => setShowInputPengeluaran(true)}>
+              <Plus size={22} className="text-[#E9EBF8]" strokeWidth={2.5} />
+            </button>
           </div>
         </div>
 
@@ -403,7 +477,11 @@ export default function DashboardPage({
         {showInputInstan && (
           <div className="absolute inset-0 z-50" style={{ borderRadius: "inherit" }}>
             <div className="absolute inset-0" style={{ borderRadius: "inherit", overflow: "hidden" }}>
-              <InputInstan onClose={() => setShowInputInstan(false)} category={selectedCategory} />
+              <InputInstan
+                onClose={() => { setShowInputInstan(false); loadData(); }}
+                category={selectedCategory}
+                userId={userId}
+              />
             </div>
           </div>
         )}
@@ -413,7 +491,8 @@ export default function DashboardPage({
           <div className="absolute inset-0 z-50" style={{ borderRadius: "inherit" }}>
             <div className="absolute inset-0" style={{ borderRadius: "inherit", overflow: "hidden" }}>
               <InputPengeluaran
-                onClose={() => setShowInputPengeluaran(false)}
+                userId={userId}
+                onClose={() => { setShowInputPengeluaran(false); loadData(); }}
                 onRecap={() => {
                   setShowInputPengeluaran(false);
                   onRecap();

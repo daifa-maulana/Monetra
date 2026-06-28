@@ -3,6 +3,7 @@ import ExpenseCalendar, { formatExpenseDate } from "../../components/ExpenseCale
 import svgPaths from "./svg-i0q9zuqhzb";
 import imgCdef7C789Cc967E560Fca00F07901E9E4 from "./c45dba6774961b79db46eabcdb4d29add249dcee.png";
 import img83268B2142E742368463468D7E429C2C1 from "./32da596fe4708bac239014123fefc5dfc5511cc8.png";
+import { supabase } from "@/lib/supabase";
 
 // ── Inline category icons ──
 const IconMakan = () => (
@@ -198,24 +199,24 @@ function Group16() {
   );
 }
 
-function Group15() {
+function Group15({ amount }: { amount: string }) {
   return (
     <div className="[word-break:break-word] absolute contents font-['SF_Pro:Bold',sans-serif] font-bold leading-[0] left-[148px] text-center top-[275px] whitespace-nowrap">
       <div className="-translate-x-1/2 -translate-y-1/2 absolute flex flex-col justify-center left-[161.5px] text-[#7459d0] text-[20px] top-[296px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Rp</p>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 absolute flex flex-col justify-center left-[213px] text-[#ef4d4d] text-[30px] top-[293px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">0.00</p>
+        <p className="leading-[normal]">{amount || "0.00"}</p>
       </div>
     </div>
   );
 }
 
-function Group17() {
+function Group17({ amount }: { amount: string }) {
   return (
     <div className="absolute contents left-[40px] top-[238px]">
       <Group16 />
-      <Group15 />
+      <Group15 amount={amount} />
     </div>
   );
 }
@@ -624,13 +625,60 @@ function Group33() {
   );
 }
 
-export default function InputPengeluaran({ onClose, onRecap }: { onClose?: () => void; onRecap?: () => void }) {
+export default function InputPengeluaran({ onClose, onRecap, userId }: { onClose?: () => void; onRecap?: () => void; userId?: string }) {
   const [showKeypad, setShowKeypad] = useState(false);
+  const [rawAmount, setRawAmount] = useState("");
+  const [note, setNote] = useState("");
   const [category, setCategory] = useState("");
   const [showCategorySheet, setShowCategorySheet] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 4, 1));
+  const [saving, setSaving] = useState(false);
+
+  const KEY_ROWS_IP = [["1","2","3"],["4","5","6"],["7","8","9"],["⌫","0","."]];
+
+  function handleKey(k: string) {
+    if (k === "⌫") { setRawAmount(p => p.slice(0, -1)); return; }
+    setRawAmount(prev => {
+      if (k === "." && prev.includes(".")) return prev;
+      if (k === "." && prev === "") return "0.";
+      if (prev.length >= 12) return prev;
+      return prev + k;
+    });
+  }
+
+  const displayAmount = rawAmount
+    ? (rawAmount.includes(".") ? rawAmount : parseInt(rawAmount, 10).toLocaleString("id-ID") + ".00")
+    : "";
+
+  const handleSave = async () => {
+    if (!rawAmount || !userId) return;
+    const amountNum = parseFloat(rawAmount);
+    if (isNaN(amountNum) || amountNum <= 0) return;
+    try {
+      setSaving(true);
+      const { data: rekData } = await supabase.from("rekening").select("id").eq("user_id", userId).limit(1);
+      const rekeningId = rekData?.[0]?.id || null;
+      const { data: catData } = await supabase.from("kategori").select("id").eq("nama", category).limit(1);
+      const kategoriId = catData?.[0]?.id || null;
+      const { error } = await supabase.from("transaksi").insert({
+        user_id: userId,
+        rekening_id: rekeningId,
+        kategori_id: kategoriId,
+        jumlah: amountNum,
+        catatan: note || null,
+        tanggal: date ? date.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+      });
+      if (error) throw error;
+      onClose?.();
+    } catch (err) {
+      console.error("Error saving transaction:", err);
+      alert("Gagal menyimpan transaksi");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="bg-[#fdfdff] overflow-clip relative rounded-[30px] size-full" data-name="Input Pengeluaran">
@@ -647,7 +695,7 @@ export default function InputPengeluaran({ onClose, onRecap }: { onClose?: () =>
       <div className="absolute bg-white h-[161px] left-0 rounded-[30px] top-[205px] w-[393px]" />
       {/* Jumlah Pengeluaran box — clickable to toggle keypad */}
       <div onClick={() => setShowKeypad(v => !v)} className="cursor-pointer">
-        <Group17 />
+        <Group17 amount={displayAmount} />
       </div>
       <div className="absolute h-[86px] left-[273px] top-[107px] w-[97px]" data-name="83268b21-42e7-4236-8463-468d7e429c2c 1">
         <img alt="" className="absolute inset-0 max-w-none object-bottom pointer-events-none size-full" src={img83268B2142E742368463468D7E429C2C1} />
@@ -691,7 +739,26 @@ export default function InputPengeluaran({ onClose, onRecap }: { onClose?: () =>
         style={{ position: "absolute", zIndex: 20, left: 220, top: 788, width: 150, height: 49, background: "transparent", border: "none", cursor: "pointer" }}
         onClick={onRecap}
       />
-      {showKeypad && <Group13 />}
+      {showKeypad && (
+        <div style={{ position: "absolute", zIndex: 30, bottom: 80, left: 0, right: 0, background: "#F8F7FF", borderRadius: "16px 16px 0 0", padding: "10px 14px 14px", boxShadow: "0 -4px 12px rgba(0,0,0,0.08)" }}>
+          {KEY_ROWS_IP.map((row, ri) => (
+            <div key={ri} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              {row.map(k => (
+                <button key={k} onClick={() => handleKey(k)} style={{ flex: 1, height: 40, borderRadius: 10, border: "none", background: "white", boxShadow: "0 2px 5px rgba(0,0,0,0.09)", cursor: "pointer", fontSize: 16, fontWeight: 600, color: k === "." || k === "\u232b" ? "#8869F5" : "#1a1a1a" }}>
+                  {k}
+                </button>
+              ))}
+            </div>
+          ))}
+          <button
+            onClick={handleSave}
+            disabled={!rawAmount || saving}
+            style={{ width: "100%", height: 42, borderRadius: 12, border: "none", background: rawAmount && !saving ? "#8869F5" : "#EAE2FB", color: rawAmount && !saving ? "white" : "#BBA8F5", fontWeight: 700, fontSize: 13, cursor: rawAmount && !saving ? "pointer" : "default" }}
+          >
+            {saving ? "Menyimpan..." : "Simpan Pengeluaran →"}
+          </button>
+        </div>
+      )}
       <div className="absolute h-[392px] left-[29px] top-[431px] w-[335px]" data-name="1">
         <Group30 />
       </div>
