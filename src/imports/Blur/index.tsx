@@ -13,9 +13,9 @@ function formatDisplay(raw: string): string {
   if (raw.includes(".")) {
     const [int, dec = ""] = raw.split(".");
     const f = int ? parseInt(int, 10).toLocaleString("id-ID") : "0";
-    return f + "." + (dec + "00").slice(0, 2);
+    return f + "," + dec;
   }
-  return parseInt(raw, 10).toLocaleString("id-ID") + ".00";
+  return parseInt(raw, 10).toLocaleString("id-ID");
 }
 
 const KEY_ROWS = [
@@ -73,7 +73,7 @@ function NumpadKey({ label, onPress }: { label: string; onPress: (k: string) => 
 
 import { supabase } from "@/lib/supabase";
 
-function InputForm({ onClose, category, userId }: { onClose?: () => void; category?: CategoryProp; userId?: string }) {
+function InputForm({ onClose, onSaved, category, userId }: { onClose?: () => void; onSaved?: () => void; category?: CategoryProp; userId?: string }) {
   const CatIcon = category?.icon;
   const catLabel = category?.label ?? "Makan/minum";
   const catColor = category?.color ?? "#73CD6C";
@@ -129,11 +129,16 @@ function InputForm({ onClose, category, userId }: { onClose?: () => void; catego
         kategori_id: kategoriId,
         jumlah: amountNum,
         catatan: note || null,
-        tanggal: new Date().toISOString().split("T")[0],
+        tanggal: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; })(),
       });
 
       if (error) throw error;
-      onClose?.();
+      // If onSaved is provided (navigate to recap), use it; else fallback to onClose
+      if (onSaved) {
+        onSaved();
+      } else {
+        onClose?.();
+      }
     } catch (err) {
       console.error("Error saving instant transaction:", err);
       alert("Gagal menyimpan transaksi");
@@ -336,7 +341,7 @@ function InputForm({ onClose, category, userId }: { onClose?: () => void; catego
   );
 }
 
-export default function Blur({ onClose, category, userId }: { onClose?: () => void; category?: CategoryProp; userId?: string }) {
+export default function Blur({ onClose, onSaved, category, userId }: { onClose?: () => void; onSaved?: () => void; category?: CategoryProp; userId?: string }) {
   return (
     // Ikuti ukuran parent phone frame (393×852) dari App.tsx
     <div style={{
@@ -414,7 +419,7 @@ export default function Blur({ onClose, category, userId }: { onClose?: () => vo
       }} />
 
       {/* Input form sheet */}
-      <InputForm onClose={onClose} category={category} userId={userId} />
+      <InputForm onClose={onClose} onSaved={onSaved} category={category} userId={userId} />
     </div>
   );
 }

@@ -20,20 +20,20 @@ function Group3() {
   );
 }
 
-function Group1() {
+function Group1({ year }: { year: number }) {
   return (
     <div className="-translate-x-1/2 absolute contents left-[calc(50%-5.91px)] top-[173.44px]">
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold h-[11.35px] justify-center leading-[0] left-[calc(50%-5.91px)] text-[#855dff] text-[13px] text-center top-[179.12px] w-[65.173px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">2026</p>
+        <p className="leading-[normal]">{year}</p>
       </div>
     </div>
   );
 }
 
-function Group4() {
+function Group4({ year }: { year: number }) {
   return (
     <div className="-translate-x-1/2 absolute contents left-[calc(50%-5.91px)] top-[173.44px]">
-      <Group1 />
+      <Group1 year={year} />
     </div>
   );
 }
@@ -186,7 +186,19 @@ function Group10() {
   );
 }
 
-export default function RecapBulanan() {
+export default function RecapBulanan({
+  selectedYear = 2026,
+  selectedMonth,
+  onSelectMonth,
+  onPrevYear,
+  onNextYear,
+}: {
+  selectedYear?: number;
+  selectedMonth?: number;
+  onSelectMonth: (month: number) => void;
+  onPrevYear: () => void;
+  onNextYear: () => void;
+}) {
   return (
     <div className="bg-[#fdfdff] overflow-clip relative rounded-[30px] size-full" data-name="Recap Bulanan 13">
       <Group3 />
@@ -198,83 +210,77 @@ export default function RecapBulanan() {
           </svg>
         </div>
       </div>
-      <Group4 />
+      <Group4 year={selectedYear} />
       <Group7 />
-      <div className="absolute h-[25px] left-[44px] top-[299px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Mei</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[44px] top-[239px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Jan</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[44px] top-[359px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Sep</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[284px] top-[359px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Des</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[284px] top-[239px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Apr</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[284px] top-[299px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Agu</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[124px] top-[239px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Feb</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[124px] top-[359px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Okt</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[204px] top-[359px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Nov</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[124px] top-[299px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Jun</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[204px] top-[299px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Jul</p>
-        </div>
-      </div>
-      <div className="absolute h-[25px] left-[204px] top-[239px] w-[65px]" data-name="Bulan">
-        <div className="absolute bg-white inset-[0_16.92%] rounded-[5px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Mar</p>
-        </div>
-      </div>
+
+      {/* Year navigation buttons */}
+      <button
+        onClick={onPrevYear}
+        style={{
+          position: "absolute",
+          zIndex: 20,
+          left: 45,
+          top: 170,
+          width: 30,
+          height: 25,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+        }}
+      />
+      <button
+        onClick={onNextYear}
+        style={{
+          position: "absolute",
+          zIndex: 20,
+          left: 318,
+          top: 170,
+          width: 30,
+          height: 25,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+        }}
+      />
+
+      {/* Month Buttons */}
+      {["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"].map((m, i) => {
+        const col = i % 4;
+        const row = Math.floor(i / 4);
+        const isSelected = selectedMonth === (i + 1);
+        return (
+          <button
+            key={m}
+            onClick={() => onSelectMonth(i + 1)}
+            className="absolute transition-colors"
+            style={{
+              width: 65,
+              height: 25,
+              left: 44 + col * 80,
+              top: 239 + row * 60,
+              cursor: "pointer",
+              border: "none",
+              background: "none",
+              padding: 0
+            }}
+            data-name="Bulan"
+          >
+            <div className={`absolute inset-[0_16.92%] rounded-[5px] ${isSelected ? "bg-[#e2d8fe]" : "bg-white"}`} />
+            <div
+              className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] inset-[32%_0_28%_0] justify-center leading-[0] text-[12px] text-center"
+              style={{
+                fontVariationSettings: '"wdth" 100',
+                color: isSelected ? "#4710C8" : "black"
+              }}
+            >
+              <p className="leading-[normal]">{m}</p>
+            </div>
+          </button>
+        );
+      })}
+
       <div className="-translate-x-1/2 absolute bg-[#f3f0fe] h-[64px] left-1/2 rounded-[20px] top-[426px] w-[311px]" />
       <Group8 />
-      <Group10 />
     </div>
   );
 }

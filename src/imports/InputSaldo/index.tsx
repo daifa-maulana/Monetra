@@ -433,16 +433,29 @@ export default function InputSaldo({
 
       if (fetchErr) throw fetchErr;
 
-      const currentSaldo = data && data.length > 0 ? (data[0].saldo || 0) : 0;
-      const newSaldo = currentSaldo + amountNum;
-      
-      // 2. Update saldo in rekening table
-      const { error } = await supabase
-        .from("rekening")
-        .update({ saldo: newSaldo })
-        .eq("user_id", userId);
+      if (data && data.length > 0) {
+        const currentSaldo = data[0].saldo || 0;
+        const newSaldo = currentSaldo + amountNum;
+        
+        // 2. Update saldo in rekening table
+        const { error: updateErr } = await supabase
+          .from("rekening")
+          .update({ saldo: newSaldo })
+          .eq("user_id", userId);
+        if (updateErr) throw updateErr;
+      } else {
+        // 2. Insert new row
+        const { error: insertErr } = await supabase
+          .from("rekening")
+          .insert({
+            user_id: userId,
+            saldo: amountNum,
+            nama: "Dompet Utama",
+            limit_pengeluaran: 0
+          });
+        if (insertErr) throw insertErr;
+      }
 
-      if (error) throw error;
       onBack();
     } catch (err) {
       console.error("Error saving saldo:", err);

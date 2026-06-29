@@ -186,7 +186,7 @@ function Group16() {
   );
 }
 
-function Group20() {
+function Group20({ pemasukan, pengeluaran, saldo }: { pemasukan: number; pengeluaran: number; saldo: number }) {
   return (
     <div className="absolute contents left-[48px] top-[623px]">
       <Group18 />
@@ -194,10 +194,10 @@ function Group20() {
         <p className="leading-[normal]">Pemasukan</p>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center leading-[0] left-[calc(50%-119.5px)] text-[#73cd6c] text-[7px] text-center top-[681px] w-[58px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">0</p>
+        <p className="leading-[normal]">{pemasukan.toLocaleString("id-ID")}</p>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center leading-[0] left-[calc(50%+1.5px)] text-[#ef4d4d] text-[7px] text-center top-[681px] w-[58px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">0</p>
+        <p className="leading-[normal]">{pengeluaran.toLocaleString("id-ID")}</p>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] h-[14px] justify-center leading-[0] left-[calc(50%+1.5px)] text-[7px] text-[rgba(0,0,0,0.7)] text-center top-[667px] w-[58px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Pengeluaran</p>
@@ -208,7 +208,7 @@ function Group20() {
         </div>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center leading-[0] left-[calc(50%+129.5px)] text-[#8c6af6] text-[7px] text-center top-[681px] w-[58px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">0</p>
+        <p className="leading-[normal]">{saldo.toLocaleString("id-ID")}</p>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] h-[14px] justify-center leading-[0] left-[calc(50%+129.5px)] text-[7px] text-[rgba(0,0,0,0.7)] text-center top-[667px] w-[58px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Saldo</p>
@@ -245,11 +245,11 @@ function Group19() {
   );
 }
 
-function Group21() {
+function Group21({ pemasukan, pengeluaran, saldo }: { pemasukan: number; pengeluaran: number; saldo: number }) {
   return (
     <div className="absolute contents left-[24px] top-[569px]">
       <div className="-translate-x-1/2 absolute bg-white h-[139px] left-[calc(50%+1px)] rounded-[20px] shadow-[0px_0px_10px_1px_#eae1fe] top-[569px] w-[347px]" />
-      <Group20 />
+      <Group20 pemasukan={pemasukan} pengeluaran={pengeluaran} saldo={saldo} />
       <Group19 />
     </div>
   );
@@ -350,7 +350,15 @@ function Group22() {
   );
 }
 
-export default function RecapBulanan() {
+export default function RecapBulanan({
+  pemasukan = 0,
+  pengeluaran = 0,
+  saldo = 0,
+}: {
+  pemasukan?: number;
+  pengeluaran?: number;
+  saldo?: number;
+}) {
   return (
     <div className="bg-[#fdfdff] overflow-clip relative rounded-[30px] size-full" data-name="Recap Bulanan 14">
       <div className="absolute bg-[#fffefe] h-[147px] left-0 rounded-[30px] shadow-[0px_1px_7px_3px_rgba(182,158,255,0.17)] top-0 w-[393px]" />
@@ -360,8 +368,7 @@ export default function RecapBulanan() {
       <Group7 />
       <div className="-translate-x-1/2 absolute bg-white h-[373px] left-1/2 rounded-[20px] shadow-[0px_0px_10px_1px_#eae1fe] top-[171px] w-[347px]" />
       <Group12 />
-      <Group21 />
-      <Group22 />
+      <Group21 pemasukan={pemasukan} pengeluaran={pengeluaran} saldo={saldo} />
     </div>
   );
 }

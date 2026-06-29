@@ -1,5 +1,13 @@
+import { createContext, useContext } from 'react';
 import svgPaths from "./svg-yyox7zj3b4";
 import imgChatGptImageMay152026053144Pm1 from "./f3f96c9a29ac726fc05617fbf5e5f1de9a09f760.png";
+
+export const RecapDataContext = createContext({
+  year: 2026,
+  monthlyTotals: Array(12).fill(0) as number[],
+  totalPemasukan: 0,
+  onMonthClick: (month: number) => {},
+});
 
 function Group3() {
   return (
@@ -63,13 +71,16 @@ function Group8() {
 }
 
 function Group62() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const text = total > 0 ? `${(total / 1000).toLocaleString("id-ID")}k` : "0";
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[80px] text-center top-[497px]">
       <div className="-translate-x-1/2 -translate-y-1/2 absolute flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] h-[12.127px] justify-center left-[106.92px] text-[8px] text-[rgba(67,67,67,0.79)] top-[514.06px] w-[39.845px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Total</p>
       </div>
       <div className="-translate-x-1/2 -translate-y-1/2 absolute flex flex-col font-['SF_Pro:Black',sans-serif] font-[1000] h-[10.763px] justify-center left-[106.52px] text-[12px] text-black top-[502.38px] w-[53.044px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">0</p>
+        <p className="leading-[normal]">{text}</p>
       </div>
     </div>
   );
@@ -84,26 +95,29 @@ function Group10() {
 }
 
 function Group30() {
+  const { totalPemasukan } = useContext(RecapDataContext);
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[244px] top-[449px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Regular',sans-serif] font-normal h-[14px] justify-center left-[244px] text-[#434343] text-[8px] top-[456px] w-[65px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Pemasukan</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center left-[244px] text-[#73cd6c] text-[12px] top-[477px] w-[96px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">Rp {totalPemasukan.toLocaleString("id-ID")}</p>
       </div>
     </div>
   );
 }
 
 function Group31() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const totalPengeluaran = monthlyTotals.reduce((a, b) => a + b, 0);
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[243px] top-[517px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Regular',sans-serif] font-normal h-[14px] justify-center left-[243px] text-[#434343] text-[8px] top-[524px] w-[65px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Pengeluaran</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center left-[243px] text-[#ef4d4d] text-[12px] top-[545px] w-[96px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">Rp {totalPengeluaran.toLocaleString("id-ID")}</p>
       </div>
     </div>
   );
@@ -191,13 +205,16 @@ function Group33() {
 }
 
 function Group34() {
+  const { monthlyTotals, totalPemasukan } = useContext(RecapDataContext);
+  const totalPengeluaran = monthlyTotals.reduce((a, b) => a + b, 0);
+  const insightPct = totalPemasukan > 0 ? Math.round((totalPengeluaran / totalPemasukan) * 100) : 0;
   return (
     <div className="-translate-x-1/2 [word-break:break-word] absolute contents leading-[0] left-[calc(50%-35px)] top-[591px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center left-[calc(50%-120.5px)] text-[#7459d0] text-[9px] top-[598px] w-[81px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Insight Tahun Ini</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] h-[14px] justify-center left-[calc(50%-120.5px)] text-[#5b5b5b] text-[7px] top-[613px] w-[171px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Kamu mengeluarkan 0% dari total pemasukan</p>
+        <p className="leading-[normal]">Kamu mengeluarkan {insightPct}% dari total pemasukan</p>
       </div>
     </div>
   );
@@ -213,13 +230,15 @@ function Group9() {
 }
 
 function Group35() {
+  const { year, monthlyTotals } = useContext(RecapDataContext);
+  const totalPengeluaran = monthlyTotals.reduce((a, b) => a + b, 0);
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[41px] text-white top-[189px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold h-[14px] justify-center left-[41px] text-[14px] top-[196px] w-[172px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Total Pengeluaran</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center left-[42px] text-[12px] top-[218px] w-[172px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">2026</p>
+        <p className="leading-[normal]">{year}</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold h-[25px] justify-center left-[42px] text-[0px] top-[272.5px] w-[189px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p>
@@ -228,7 +247,7 @@ function Group35() {
           </span>
           <span className="leading-[normal] text-[32px]">{` `}</span>
           <span className="[word-break:break-word] font-['SF_Pro:Heavy',sans-serif] font-[860] leading-[normal] text-[24px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-            0
+            {totalPengeluaran.toLocaleString("id-ID")}
           </span>
         </p>
       </div>
@@ -289,132 +308,168 @@ function Group27() {
 }
 
 function Group13() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[0] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[724px]">
       <div className="absolute bg-[#eeecfd] h-[10px] left-[70px] rounded-[3px] top-[724px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#896aed] text-[6px] text-center top-[729px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">9%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group14() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[10] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[1164px]">
       <div className="absolute bg-[#d4c9fa] h-[10px] left-[70px] rounded-[3px] top-[1164px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#4d359a] text-[6px] text-center top-[1169px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">7%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group15() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[1] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[768px]">
       <div className="absolute bg-[#fde8ef] h-[10px] left-[70px] rounded-[3px] top-[768px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#fd6795] text-[6px] text-center top-[773px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">7%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group16() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[11] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[1208px]">
       <div className="absolute bg-[#eeb9c9] h-[10px] left-[70px] rounded-[3px] top-[1208px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#bd345e] text-[6px] text-center top-[1213px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">9%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group17() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[2] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[812px]">
       <div className="absolute bg-[#e4f8ea] h-[10px] left-[70px] rounded-[3px] top-[812px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#73d283] text-[6px] text-center top-[817px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">8%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group18() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[3] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[856px]">
       <div className="absolute bg-[#fef6e2] h-[10px] left-[70px] rounded-[3px] top-[856px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#fddc74] text-[6px] text-center top-[861px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">8%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group19() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[4] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[900px]">
       <div className="absolute bg-[#e4f2fe] h-[10px] left-[70px] rounded-[3px] top-[900px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#8bcafe] text-[6px] text-center top-[905px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">8%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group20() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[5] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[944px]">
       <div className="absolute bg-[#eae3ff] h-[10px] left-[70px] rounded-[3px] top-[944px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#c2afff] text-[6px] text-center top-[949px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">9%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group21() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[6] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[988px]">
       <div className="absolute bg-[#ffe6ee] h-[10px] left-[70px] rounded-[3px] top-[988px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#f7abc2] text-[6px] text-center top-[993px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">11%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group22() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[7] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[1033px]">
       <div className="absolute bg-[#e7ffeb] h-[10px] left-[70px] rounded-[3px] top-[1033px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#92e6a0] text-[6px] text-center top-[1038px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">7%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group23() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[8] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[1078px]">
       <div className="absolute bg-[#fffae8] h-[10px] left-[70px] rounded-[3px] top-[1078px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#ffe288] text-[6px] text-center top-[1083px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">8%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
 function Group24() {
+  const { monthlyTotals } = useContext(RecapDataContext);
+  const total = monthlyTotals.reduce((a, b) => a + b, 0);
+  const pct = total > 0 ? Math.round((monthlyTotals[9] / total) * 100) : 0;
   return (
     <div className="absolute contents left-[70px] top-[1120px]">
       <div className="absolute bg-[#dcefff] h-[10px] left-[70px] rounded-[3px] top-[1120px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[78px] text-[#98d0ff] text-[6px] text-center top-[1125px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">9%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
@@ -863,9 +918,23 @@ function Group49() {
   );
 }
 
-export default function RecapTahunan() {
+export default function RecapTahunan4({
+  year = 2026,
+  monthlyTotals = Array(12).fill(0),
+  totalPemasukan = 0,
+  onMonthClick,
+}: {
+  year?: number;
+  monthlyTotals?: number[];
+  totalPemasukan?: number;
+  onMonthClick?: (month: number) => void;
+}) {
+  const formatRp = (n) => "Rp " + (n || 0).toLocaleString('id-ID');
+  const ARROW_TOPS = [713, 757, 801, 845, 889, 933, 977, 1021, 1065, 1109, 1153, 1197];
+
   return (
-    <div className="bg-[#fdfdff] overflow-clip relative rounded-[30px] size-full" data-name="Recap Tahunan 4">
+    <RecapDataContext.Provider value={{ year, monthlyTotals, totalPemasukan, onMonthClick }}>
+      <div className="bg-[#fdfdff] overflow-clip relative rounded-[30px] size-full" data-name="Recap Tahunan 4">
       <Group8 />
       <div className="-translate-x-1/2 absolute bg-white h-[42px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_10px_1px_#eae1fe] top-[323px] w-[350px]" />
       <div className="-translate-x-1/2 absolute bg-white h-[214px] left-1/2 rounded-[15px] shadow-[0px_0px_7px_1px_#ede8ff] top-[423px] w-[353px]" />
@@ -1030,7 +1099,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Januari</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[715px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[0])}</p>
       </div>
       <Group13 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1142px] w-[350px]" />
@@ -1038,7 +1107,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">November</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[1155px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[10])}</p>
       </div>
       <Group14 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[746px] w-[350px]" />
@@ -1046,7 +1115,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Februari</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[759px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[1])}</p>
       </div>
       <Group15 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1186px] w-[350px]" />
@@ -1054,7 +1123,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Desember</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[1199px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[11])}</p>
       </div>
       <Group16 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[790px] w-[350px]" />
@@ -1062,7 +1131,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Maret</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[803px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[2])}</p>
       </div>
       <Group17 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[834px] w-[350px]" />
@@ -1070,7 +1139,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">April</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[847px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[3])}</p>
       </div>
       <Group18 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[878px] w-[350px]" />
@@ -1078,7 +1147,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Mei</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[891px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[4])}</p>
       </div>
       <Group19 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[922px] w-[350px]" />
@@ -1086,7 +1155,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Juni</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[935px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[5])}</p>
       </div>
       <Group20 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[966px] w-[350px]" />
@@ -1094,7 +1163,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Juli</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[979px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[6])}</p>
       </div>
       <Group21 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1010px] w-[350px]" />
@@ -1102,7 +1171,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Agustus</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[1024px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[7])}</p>
       </div>
       <Group22 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1054px] w-[350px]" />
@@ -1110,7 +1179,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">September</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[1069px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[8])}</p>
       </div>
       <Group23 />
       <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1098px] w-[350px]" />
@@ -1118,7 +1187,7 @@ export default function RecapTahunan() {
         <p className="leading-[normal]">Oktober</p>
       </div>
       <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[318px] text-[10px] text-black text-right top-[1111px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">{formatRp(monthlyTotals[9])}</p>
       </div>
       <Group24 />
       <Group48 />
@@ -1181,7 +1250,10 @@ export default function RecapTahunan() {
       <Group59 />
       <Group60 />
       <Group61 />
-      <Group49 />
+      {ARROW_TOPS.map((top, idx) => (
+        <button key={idx} onClick={() => onMonthClick?.(idx + 1)} style={{ position: "absolute", left: 320, top: top - 5, width: 40, height: 30, background: "transparent", border: "none", cursor: "pointer", zIndex: 100 }} />
+      ))}
     </div>
+    </RecapDataContext.Provider>
   );
 }

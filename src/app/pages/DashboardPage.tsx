@@ -48,6 +48,7 @@ export default function DashboardPage({
   onAddExpenseOpenComplete,
   onNavigateSaldo,
   onNavigateLimit,
+  onRecapHarian,
 }: {
   userId: string;
   onLogout: () => void;
@@ -56,6 +57,7 @@ export default function DashboardPage({
   onAddExpenseOpenComplete?: () => void;
   onNavigateSaldo: () => void;
   onNavigateLimit: () => void;
+  onRecapHarian?: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"dashboard" | "recap">("dashboard");
   const [cardSlide, setCardSlide] = useState(0);
@@ -102,8 +104,9 @@ export default function DashboardPage({
     }
     // Load total pengeluaran bulan ini
     const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+    const toLocalDateStr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const firstDay = toLocalDateStr(new Date(now.getFullYear(), now.getMonth(), 1));
+    const lastDay = toLocalDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 0));
     const { data: txData } = await supabase
       .from("transaksi")
       .select("jumlah")
@@ -286,12 +289,12 @@ export default function DashboardPage({
                         }}
                       >
                         <div className="px-5 pt-5 pb-3 pr-40">
-                          <p className="text-white/90 text-[11px] font-medium">Total Pengeluaran Bulan Ini</p>
+                          <p className="text-white/90 text-[11px] font-medium">Sisa Saldo Pengeluaran</p>
                           <p className="text-white font-bold text-[28px] mt-2 leading-none">
-                            {formatSaldo(totalPengeluaran)}
+                            {limit !== null ? formatSaldo(Math.max(0, limit - totalPengeluaran)) : "Rp 0,00"}
                           </p>
                           <p className="text-white/70 text-[11px] mt-3">
-                            {new Date().toLocaleString("id-ID", { month: "long", year: "numeric" })}
+                            Limit: {limit !== null ? formatSaldo(limit) : "Belum diatur"}
                           </p>
                         </div>
                         <div className="mx-5 mb-4 mt-3">
@@ -423,7 +426,7 @@ export default function DashboardPage({
           </div>
 
           {/* ── Catat Instan ── */}
-          <div className="px-5 mt-5 pb-6">
+          <div className="px-5 mt-5 pb-32">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-[18px] h-[18px] bg-[#EAE2FB] rounded-[4px] flex items-center justify-center">
                 <LayoutDashboard size={10} className="text-[#8869F5]" />
@@ -509,6 +512,7 @@ export default function DashboardPage({
             <div className="absolute inset-0" style={{ borderRadius: "inherit", overflow: "hidden" }}>
               <InputInstan
                 onClose={() => { setShowInputInstan(false); loadData(); }}
+                onSaved={() => { setShowInputInstan(false); loadData(); onRecapHarian?.(); }}
                 category={selectedCategory}
                 userId={userId}
               />

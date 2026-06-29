@@ -201,12 +201,10 @@ function Group16() {
 
 function Group15({ amount }: { amount: string }) {
   return (
-    <div className="[word-break:break-word] absolute contents font-['SF_Pro:Bold',sans-serif] font-bold leading-[0] left-[148px] text-center top-[275px] whitespace-nowrap">
-      <div className="-translate-x-1/2 -translate-y-1/2 absolute flex flex-col justify-center left-[161.5px] text-[#7459d0] text-[20px] top-[296px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp</p>
-      </div>
-      <div className="-translate-x-1/2 -translate-y-1/2 absolute flex flex-col justify-center left-[213px] text-[#ef4d4d] text-[30px] top-[293px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">{amount || "0.00"}</p>
+    <div className="absolute flex items-center justify-center top-[265px] left-[40px] w-[314px] h-[56px] pointer-events-none">
+      <div className="flex items-baseline gap-[6px]" style={{ transform: "translateY(2px)" }}>
+        <span className="text-[#7459d0] text-[20px] font-['SF_Pro:Bold',sans-serif] font-bold">Rp</span>
+        <span className="text-[#ef4d4d] text-[30px] font-['SF_Pro:Bold',sans-serif] font-bold">{amount || "0.00"}</span>
       </div>
     </div>
   );
@@ -631,9 +629,9 @@ export default function InputPengeluaran({ onClose, onRecap, userId }: { onClose
   const [note, setNote] = useState("");
   const [category, setCategory] = useState("");
   const [showCategorySheet, setShowCategorySheet] = useState(false);
-  const [date, setDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<Date | null>(() => new Date());
   const [showCalendar, setShowCalendar] = useState(false);
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 4, 1));
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
   const [saving, setSaving] = useState(false);
 
   const KEY_ROWS_IP = [["1","2","3"],["4","5","6"],["7","8","9"],["⌫","0","."]];
@@ -648,9 +646,16 @@ export default function InputPengeluaran({ onClose, onRecap, userId }: { onClose
     });
   }
 
-  const displayAmount = rawAmount
-    ? (rawAmount.includes(".") ? rawAmount : parseInt(rawAmount, 10).toLocaleString("id-ID") + ".00")
-    : "";
+  let displayAmount = "";
+  if (rawAmount) {
+    if (rawAmount.includes(".")) {
+      const [int, dec = ""] = rawAmount.split(".");
+      const f = int ? parseInt(int, 10).toLocaleString("id-ID") : "0";
+      displayAmount = f + "," + dec;
+    } else {
+      displayAmount = parseInt(rawAmount, 10).toLocaleString("id-ID");
+    }
+  }
 
   const handleSave = async () => {
     if (!rawAmount || !userId) return;
@@ -668,7 +673,7 @@ export default function InputPengeluaran({ onClose, onRecap, userId }: { onClose
         kategori_id: kategoriId,
         jumlah: amountNum,
         catatan: note || null,
-        tanggal: date ? date.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+        tanggal: (() => { const d = date ?? new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; })(),
       });
       if (error) throw error;
       onClose?.();

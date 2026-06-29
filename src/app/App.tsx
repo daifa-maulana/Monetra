@@ -38,6 +38,7 @@ export default function App() {
   const [openAddExpenseOnLoad, setOpenAddExpenseOnLoad] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [targetPageAfterSplash, setTargetPageAfterSplash] = useState<Page>("login");
+  const [targetMonthContext, setTargetMonthContext] = useState<{ month: number; year: number } | null>(null);
 
   useEffect(() => {
     // Check initial session
@@ -117,6 +118,7 @@ export default function App() {
           onAddExpenseOpenComplete={() => setOpenAddExpenseOnLoad(false)}
           onNavigateSaldo={() => setPage("input-saldo")}
           onNavigateLimit={() => setPage("input-limit")}
+          onRecapHarian={() => setPage("recap-harian")}
         />
       )}
 
@@ -137,6 +139,7 @@ export default function App() {
       {page === "recap-bulanan" && (
         <RecapBulananPage
           userId={userId || ""}
+          initialMonthContext={targetMonthContext}
           onBack={() => setPage("dashboard")}
           onDashboard={() => setPage("dashboard")}
           onAddExpense={() => {
@@ -151,6 +154,10 @@ export default function App() {
       {page === "recap-tahunan" && (
         <RecapTahunanPage
           userId={userId || ""}
+          onNavigateToMonth={(month, year) => {
+            setTargetMonthContext({ month, year });
+            setPage("recap-bulanan");
+          }}
           onBack={() => setPage("dashboard")}
           onDashboard={() => setPage("dashboard")}
           onAddExpense={() => {

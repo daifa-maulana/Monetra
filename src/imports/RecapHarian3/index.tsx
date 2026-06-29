@@ -714,7 +714,6 @@ export default function RecapHarian() {
         <p className="leading-[normal]">Rp 80.000</p>
       </div>
       <Group28 />
-      <Group40 />
     </div>
   );
 }

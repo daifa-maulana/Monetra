@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import RecapTahunan1 from "@/imports/RecapTahunan1/index";
 import RecapTahunan2 from "@/imports/RecapTahunan2/index";
 import RecapTahunan4 from "@/imports/RecapTahunan4/index";
@@ -24,9 +25,62 @@ export default function RecapTahunanPage({
   onDashboard?: () => void;
   onAddExpense?: () => void;
   userId?: string;
+  onNavigateToMonth?: (month: number, year: number) => void;
 }) {
   const [subPage, setSubPage] = useState<RecapSubPage>("awal");
   const goToDashboard = onDashboard ?? onBack;
+
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [monthlyTotals, setMonthlyTotals] = useState<number[]>(Array(12).fill(0));
+  const [totalPemasukan, setTotalPemasukan] = useState(0);
+
+  useEffect(() => {
+    if (!userId || subPage !== "detail") return;
+
+    let cancelled = false;
+    async function fetchYearData() {
+      try {
+        // 1. Fetch Pemasukan
+        const { data: rekeningData } = await supabase
+          .from("rekening")
+          .select("saldo")
+          .eq("user_id", userId)
+          .single();
+        if (!cancelled) setTotalPemasukan(rekeningData?.saldo ?? 0);
+
+        // 2. Fetch Pengeluaran for selected year
+        const startDate = `${selectedYear}-01-01`;
+        const endDate = `${selectedYear}-12-31`;
+
+        const { data: txData } = await supabase
+          .from("transaksi")
+          .select("jumlah, tanggal")
+          .eq("user_id", userId)
+          .gte("tanggal", startDate)
+          .lte("tanggal", endDate);
+
+        if (cancelled) return;
+
+        const totals = Array(12).fill(0);
+        if (txData) {
+          for (const tx of txData) {
+            // tanggal format is YYYY-MM-DD
+            const monthStr = tx.tanggal.split("-")[1];
+            if (monthStr) {
+              const monthIdx = parseInt(monthStr, 10) - 1; // 0-11
+              totals[monthIdx] += (tx.jumlah ?? 0);
+            }
+          }
+        }
+        setMonthlyTotals(totals);
+      } catch (err) {
+        console.error("Error fetching recap tahunan:", err);
+      }
+    }
+
+    fetchYearData();
+    return () => { cancelled = true; };
+  }, [userId, subPage, selectedYear]);
 
   const handleBack = () => {
     if (subPage === "detail") { setSubPage("kalender"); return; }
@@ -61,7 +115,10 @@ export default function RecapTahunanPage({
             {subPage === "kalender" && (
               <div style={{ position: "relative", width: W, height: H }}>
                 <RecapTahunan2
-                  onConfirm={() => setSubPage("detail")}
+                  onConfirm={(year) => {
+                    setSelectedYear(year);
+                    setSubPage("detail");
+                  }}
                   onBack={handleBack}
                   onDashboard={goToDashboard}
                   onRecap={() => setSubPage("awal")}
@@ -71,7 +128,12 @@ export default function RecapTahunanPage({
 
             {subPage === "detail" && (
               <div className="recap-t-scroll" style={{ position: "relative", width: W, height: 1340 }}>
-                <RecapTahunan4 />
+                <RecapTahunan4
+                  year={selectedYear}
+                  monthlyTotals={monthlyTotals}
+                  totalPemasukan={totalPemasukan}
+                  onMonthClick={(month) => onNavigateToMonth?.(month, selectedYear)}
+                />
                 <button style={{ position: "absolute", zIndex: 20, left: 37, top: 113, width: 73, height: 21, background: "transparent", border: "none", cursor: "pointer" }} onClick={() => onTabChange("harian")} />
                 <button style={{ position: "absolute", zIndex: 20, left: 160, top: 113, width: 73, height: 21, background: "transparent", border: "none", cursor: "pointer" }} onClick={() => onTabChange("bulanan")} />
               </div>

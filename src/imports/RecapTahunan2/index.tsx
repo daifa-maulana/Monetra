@@ -7,7 +7,7 @@ export default function RecapTahunan({
   onDashboard,
   onRecap,
 }: {
-  onConfirm?: () => void;
+  onConfirm?: (year: number) => void;
   onBack?: () => void;
   onDashboard?: () => void;
   onRecap?: () => void;
@@ -65,7 +65,7 @@ export default function RecapTahunan({
               key={year}
               onClick={() => {
                 setSelectedYear(year);
-                onConfirm?.();
+                onConfirm?.(year);
               }}
               className={`py-2 px-4 rounded-md text-xs font-semibold transition-colors ${
                 year === selectedYear

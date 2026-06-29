@@ -1,6 +1,131 @@
+import { useRef, useEffect } from "react";
 import svgPaths from "./svg-vrh57ted1p";
 import imgChatGptImage14Mei202614284915 from "./945e4b2ed69c1c8b798ecf63e181e086addea369.png";
 import imgChatGptImageMay152026053144Pm1 from "./f3f96c9a29ac726fc05617fbf5e5f1de9a09f760.png";
+
+export interface CategoryData {
+  nama: string;
+  total: number;
+  pct: number;
+}
+
+// ── Icons ──
+const IconMakan = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#E8F5E9" />
+    <ellipse cx="13" cy="17" rx="6" ry="2.5" stroke="#4CAF50" strokeWidth="1.5" fill="none" />
+    <path d="M7 15.5 Q7 12 13 12 Q19 12 19 15.5" stroke="#4CAF50" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <rect x="18" y="12" width="4" height="6" rx="1" stroke="#4CAF50" strokeWidth="1.3" fill="none" />
+    <line x1="19.5" y1="11" x2="20.5" y2="8" stroke="#4CAF50" strokeWidth="1.3" strokeLinecap="round" />
+  </svg>
+);
+const IconTransportasi = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#E3F2FD" />
+    <rect x="8" y="9" width="12" height="10" rx="2" stroke="#2196F3" strokeWidth="1.5" fill="none" />
+    <rect x="10" y="11" width="3" height="2.5" rx="0.5" stroke="#2196F3" strokeWidth="1" fill="none" />
+    <rect x="15" y="11" width="3" height="2.5" rx="0.5" stroke="#2196F3" strokeWidth="1" fill="none" />
+    <line x1="11" y1="19" x2="17" y2="19" stroke="#2196F3" strokeWidth="1.3" strokeLinecap="round" />
+    <circle cx="10.5" cy="20.5" r="1.2" stroke="#2196F3" strokeWidth="1.2" fill="none" />
+    <circle cx="17.5" cy="20.5" r="1.2" stroke="#2196F3" strokeWidth="1.2" fill="none" />
+  </svg>
+);
+const IconPajak = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#FBE9E7" />
+    <rect x="9" y="8" width="9" height="11" rx="1" stroke="#FF5722" strokeWidth="1.5" fill="none" />
+    <path d="M15 8 L18 11" stroke="#FF5722" strokeWidth="1.2" />
+    <line x1="11" y1="13" x2="16" y2="13" stroke="#FF5722" strokeWidth="1" strokeLinecap="round" />
+    <line x1="11" y1="15" x2="14" y2="15" stroke="#FF5722" strokeWidth="1" strokeLinecap="round" />
+    <circle cx="17.5" cy="19.5" r="3" fill="#FBE9E7" stroke="#FF5722" strokeWidth="1.3" />
+    <text x="17.5" y="21" textAnchor="middle" fontSize="4" fill="#FF5722" fontWeight="bold">%</text>
+  </svg>
+);
+const IconListrik = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#FFF8E1" />
+    <circle cx="14" cy="13.5" r="4.5" stroke="#FF9800" strokeWidth="1.5" fill="none" />
+    <path d="M15 10.5 L12.5 13.5 L14.2 13.5 L13 16.5 L15.5 13.5 L13.8 13.5 Z" fill="#FF9800" />
+    <line x1="14" y1="7" x2="14" y2="8.2" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="18.5" y1="9" x2="17.6" y2="9.9" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="20" y1="13.5" x2="18.8" y2="13.5" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="9.5" y1="9" x2="10.4" y2="9.9" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="8" y1="13.5" x2="9.2" y2="13.5" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="11.5" y1="19" x2="16.5" y2="19" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="12" y1="20.5" x2="16" y2="20.5" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round" />
+  </svg>
+);
+const IconPendidikan = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#EDE7F6" />
+    <path d="M7 13 L14 10 L21 13 L14 16 Z" stroke="#7C4DFF" strokeWidth="1.5" fill="none" strokeLinejoin="round" />
+    <line x1="21" y1="13" x2="21" y2="17" stroke="#7C4DFF" strokeWidth="1.3" strokeLinecap="round" />
+    <circle cx="21" cy="17.5" r="0.8" fill="#7C4DFF" />
+  </svg>
+);
+const IconKesehatan = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#FCE4EC" />
+    <path d="M14 20 C14 20 7 16 7 11.5 C7 9.5 8.5 8 10.5 8 C12 8 13.5 9 14 10.5 C14.5 9 16 8 17.5 8 C19.5 8 21 9.5 21 11.5 C21 16 14 20 14 20 Z" stroke="#E91E63" strokeWidth="1.5" fill="none" />
+    <line x1="14" y1="10" x2="14" y2="14" stroke="#E91E63" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="12" y1="12" x2="16" y2="12" stroke="#E91E63" strokeWidth="1.3" strokeLinecap="round" />
+  </svg>
+);
+const IconPulsa = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#E0F7FA" />
+    <rect x="10" y="7" width="8" height="13" rx="1.5" stroke="#00BCD4" strokeWidth="1.5" fill="none" />
+    <rect x="12" y="7.5" width="4" height="1" rx="0.5" fill="#00BCD4" />
+    <rect x="11.5" y="16" width="1.2" height="1.5" rx="0.3" fill="#00BCD4" />
+    <rect x="13.4" y="15" width="1.2" height="2.5" rx="0.3" fill="#00BCD4" />
+    <rect x="15.3" y="14" width="1.2" height="3.5" rx="0.3" fill="#00BCD4" />
+  </svg>
+);
+const IconHiburan = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#EDE8FF" />
+    <circle cx="14" cy="11" r="3.5" stroke="#8869F5" strokeWidth="1.3" fill="none" />
+    <path d="M13 9.5 L16 11 L13 12.5 Z" fill="#8869F5" />
+    <path d="M8 15.5 Q8 13.5 14 13.5 Q20 13.5 20 15.5 Q20 19 17 19.5 L14 20 L11 19.5 Q8 19 8 15.5 Z" stroke="#8869F5" strokeWidth="1.3" fill="none" />
+    <line x1="11" y1="15.5" x2="11" y2="17.5" stroke="#8869F5" strokeWidth="1" strokeLinecap="round" />
+    <line x1="10" y1="16.5" x2="12" y2="16.5" stroke="#8869F5" strokeWidth="1" strokeLinecap="round" />
+    <circle cx="17" cy="15.8" r="0.7" fill="#8869F5" />
+    <circle cx="18.2" cy="16.8" r="0.7" fill="#8869F5" />
+  </svg>
+);
+const IconPerawatan = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#FFF3E0" />
+    <circle cx="14" cy="13" r="5" stroke="#E91E63" strokeWidth="1.5" fill="none" />
+    <path d="M9 11 Q14 8 19 11" stroke="#E91E63" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+    <path d="M11.5 13.5 Q12.5 14.5 13 13.5" stroke="#E91E63" strokeWidth="1" fill="none" strokeLinecap="round" />
+    <path d="M15 13.5 Q15.5 14.5 16.5 13.5" stroke="#E91E63" strokeWidth="1" fill="none" strokeLinecap="round" />
+    <path d="M20 9 L20.5 8 L21 9 L20 9.5 Z" fill="#E91E63" />
+  </svg>
+);
+const IconLainnya = () => (
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <circle cx="14" cy="14" r="14" fill="#ECEFF1" />
+    <rect x="8" y="8" width="5" height="5" rx="1" stroke="#607D8B" strokeWidth="1.3" fill="none" />
+    <rect x="15" y="8" width="5" height="5" rx="1" stroke="#607D8B" strokeWidth="1.3" fill="none" />
+    <rect x="8" y="15" width="5" height="5" rx="1" stroke="#607D8B" strokeWidth="1.3" fill="none" />
+    <rect x="15" y="15" width="5" height="5" rx="1" stroke="#607D8B" strokeWidth="1.3" fill="none" strokeDasharray="1.5 1" />
+  </svg>
+);
+
+const getCategoryIcon = (name: string) => {
+  const n = name.toLowerCase();
+  if (n.includes("makan") || n.includes("minum")) return <IconMakan />;
+  if (n.includes("transport")) return <IconTransportasi />;
+  if (n.includes("pajak")) return <IconPajak />;
+  if (n.includes("listrik")) return <IconListrik />;
+  if (n.includes("didik")) return <IconPendidikan />;
+  if (n.includes("sehat")) return <IconKesehatan />;
+  if (n.includes("pulsa") || n.includes("data")) return <IconPulsa />;
+  if (n.includes("hibur")) return <IconHiburan />;
+  if (n.includes("rawat")) return <IconPerawatan />;
+  return <IconLainnya />;
+};
 
 function Group3() {
   return (
@@ -85,111 +210,111 @@ function Group35() {
   );
 }
 
-function Group13() {
+function Group13({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[724px]">
       <div className="absolute bg-[#e4fcee] h-[10px] left-[69px] rounded-[3px] top-[724px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#0ec57e] text-[6px] text-center top-[729px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">35%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group14() {
+function Group14({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[768px]">
       <div className="absolute bg-[#f1eafe] h-[10px] left-[69px] rounded-[3px] top-[768px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#6b31d8] text-[6px] text-center top-[773px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">15%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group15() {
+function Group15({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[812px]">
       <div className="absolute bg-[#fee9f2] h-[10px] left-[69px] rounded-[3px] top-[812px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#e7267f] text-[6px] text-center top-[817px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">10%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group16() {
+function Group16({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[856px]">
       <div className="absolute bg-[#eae0fd] h-[10px] left-[69px] rounded-[3px] top-[856px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#6930d6] text-[6px] text-center top-[861px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">10%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group17() {
+function Group17({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[900px]">
       <div className="absolute bg-[#ebf2fe] h-[10px] left-[69px] rounded-[3px] top-[900px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#225aff] text-[6px] text-center top-[905px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">8%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group18() {
+function Group18({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[944px]">
       <div className="absolute bg-[#eaf1fd] h-[10px] left-[69px] rounded-[3px] top-[944px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#1d50fd] text-[6px] text-center top-[949px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">7%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group19() {
+function Group19({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[988px]">
       <div className="absolute bg-[#ffebf1] h-[10px] left-[69px] rounded-[3px] top-[988px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#f44f56] text-[6px] text-center top-[993px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">5%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group20() {
+function Group20({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[1032px]">
       <div className="absolute bg-[#fdf2e9] h-[10px] left-[69px] rounded-[3px] top-[1032px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#fe8512] text-[6px] text-center top-[1037px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">4%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group21() {
+function Group21({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[1076px]">
       <div className="absolute bg-[#e9fcf1] h-[10px] left-[69px] rounded-[3px] top-[1076px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#0fc383] text-[6px] text-center top-[1081px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">3%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
 }
 
-function Group22() {
+function Group22({ pct }: { pct: number }) {
   return (
     <div className="absolute contents left-[69px] top-[1120px]">
       <div className="absolute bg-[#f4f4f7] h-[10px] left-[69px] rounded-[3px] top-[1120px] w-[16px]" />
       <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[6px] justify-center leading-[0] left-[77px] text-[#5f6983] text-[6px] text-center top-[1125px] w-[14px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">3%</p>
+        <p className="leading-[normal]">{pct}%</p>
       </div>
     </div>
   );
@@ -309,27 +434,27 @@ function Group23() {
   );
 }
 
-function Group28() {
+function Group28({ pemasukan }: { pemasukan: number }) {
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[245px] top-[459px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Regular',sans-serif] font-normal h-[14px] justify-center left-[245px] text-[#434343] text-[8px] top-[466px] w-[65px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Pemasukan</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center left-[245px] text-[#73cd6c] text-[12px] top-[487px] w-[96px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">Rp {pemasukan.toLocaleString("id-ID")}</p>
       </div>
     </div>
   );
 }
 
-function Group29() {
+function Group29({ pengeluaran }: { pengeluaran: number }) {
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[244px] top-[527px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Regular',sans-serif] font-normal h-[14px] justify-center left-[244px] text-[#434343] text-[8px] top-[534px] w-[65px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Pengeluaran</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Heavy',sans-serif] font-[860] h-[14px] justify-center left-[244px] text-[#ef4d4d] text-[12px] top-[555px] w-[96px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
+        <p className="leading-[normal]">Rp {pengeluaran.toLocaleString("id-ID")}</p>
       </div>
     </div>
   );
@@ -387,13 +512,13 @@ function Group26() {
   );
 }
 
-function Group30() {
+function Group30({ pemasukan, pengeluaran }: { pemasukan: number; pengeluaran: number }) {
   return (
     <div className="absolute contents left-[196px] top-[451px]">
       <div className="absolute bg-white h-[52px] left-[197px] rounded-[10px] shadow-[0px_0px_7px_1px_#ede8ff] top-[451px] w-[152px]" />
       <div className="absolute bg-white h-[52px] left-[196px] rounded-[10px] shadow-[0px_0px_7px_1px_#ede8ff] top-[519px] w-[152px]" />
-      <Group28 />
-      <Group29 />
+      <Group28 pemasukan={pemasukan} />
+      <Group29 pengeluaran={pengeluaran} />
       <Group27 />
       <Group26 />
     </div>
@@ -416,14 +541,14 @@ function Group31() {
   );
 }
 
-function Group32() {
+function Group32({ insightPct }: { insightPct: number }) {
   return (
     <div className="-translate-x-1/2 [word-break:break-word] absolute contents leading-[0] left-[calc(50%-35px)] top-[591px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center left-[calc(50%-120.5px)] text-[#7459d0] text-[9px] top-[598px] w-[72px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Insight Bulan Ini</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] h-[14px] justify-center left-[calc(50%-120.5px)] text-[#5b5b5b] text-[7px] top-[613px] w-[171px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Kamu mengeluarkan 0% dari total pemasukan</p>
+        <p className="leading-[normal]">Kamu mengeluarkan {insightPct}% dari total pemasukan</p>
       </div>
     </div>
   );
@@ -464,14 +589,14 @@ function Group10() {
   );
 }
 
-function Group33() {
+function Group33({ monthName, year, totalPengeluaran }: { monthName: string; year: number; totalPengeluaran: number }) {
   return (
     <div className="[word-break:break-word] absolute contents leading-[0] left-[41px] text-white top-[189px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold h-[14px] justify-center left-[41px] text-[14px] top-[196px] w-[172px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p className="leading-[normal]">Total Pengeluaran</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center left-[42px] text-[12px] top-[218px] w-[172px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Januari 2026</p>
+        <p className="leading-[normal]">{monthName} {year}</p>
       </div>
       <div className="-translate-y-1/2 absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold h-[25px] justify-center left-[42px] text-[0px] top-[272.5px] w-[170px]" style={{ fontVariationSettings: '"wdth" 100' }}>
         <p>
@@ -480,7 +605,7 @@ function Group33() {
           </span>
           <span className="leading-[normal] text-[32px]">{` `}</span>
           <span className="[word-break:break-word] font-['SF_Pro:Heavy',sans-serif] font-[860] leading-[normal] text-[24px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-            2.250.000
+            {totalPengeluaran.toLocaleString("id-ID")}
           </span>
         </p>
       </div>
@@ -488,7 +613,7 @@ function Group33() {
   );
 }
 
-function Group34() {
+function Group34({ monthName, year, totalPengeluaran }: { monthName: string; year: number; totalPengeluaran: number }) {
   return (
     <div className="absolute contents left-[41px] top-[189px]">
       <div className="absolute h-[94px] left-[250px] top-[193px] w-[103px]" data-name="ChatGPT Image May 15, 2026, 05_31_44 PM 1">
@@ -496,7 +621,7 @@ function Group34() {
           <img alt="" className="absolute h-[143.46%] left-[-57.47%] max-w-none top-[-21.73%] w-[195.4%]" src={imgChatGptImageMay152026053144Pm1} />
         </div>
       </div>
-      <Group33 />
+      <Group33 monthName={monthName} year={year} totalPengeluaran={totalPengeluaran} />
     </div>
   );
 }
@@ -596,194 +721,242 @@ function Group36() {
   );
 }
 
-export default function RecapBulananJanuari() {
+const CATEGORY_COLORS = [
+  { fill: "#8DFFC1", pctColor: "#0ec57e", pctBg: "#e4fcee" },
+  { fill: "#DCCBFF", pctColor: "#6b31d8", pctBg: "#f1eafe" },
+  { fill: "#FFD7D7", pctColor: "#e7267f", pctBg: "#fee9f2" },
+  { fill: "#B896FF", pctColor: "#6930d6", pctBg: "#eae0fd" },
+  { fill: "#CEE2FF", pctColor: "#225aff", pctBg: "#ebf2fe" },
+  { fill: "#A4C6FA", pctColor: "#1d50fd", pctBg: "#eaf1fd" },
+  { fill: "#FEABB0", pctColor: "#f44f56", pctBg: "#ffebf1" },
+  { fill: "#FFDCBC", pctColor: "#fe8512", pctBg: "#fdf2e9" },
+  { fill: "#53D58E", pctColor: "#0fc383", pctBg: "#e9fcf1" },
+  { fill: "#C3C3C3", pctColor: "#5f6983", pctBg: "#f4f4f7" },
+];
+
+interface CategoryData {
+  nama: string;
+  total: number;
+  pct: number;
+}
+
+export default function RecapBulananJanuari({
+  monthName = "Januari",
+  year = 2026,
+  totalPengeluaran = 0,
+  pemasukan = 0,
+  categoryData = [],
+  selectedMonth = 1,
+  onSelectMonthQuick,
+}: {
+  monthName?: string;
+  year?: number;
+  totalPengeluaran?: number;
+  pemasukan?: number;
+  categoryData?: CategoryData[];
+  selectedMonth?: number;
+  onSelectMonthQuick?: (month: number) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      // selectedMonth is 1-indexed, but the children also contain a <style> tag at index 0.
+      // So the buttons are at indices 1 through 12.
+      const selectedItem = scrollRef.current.children[selectedMonth] as HTMLElement;
+      if (selectedItem) {
+        scrollRef.current.scrollLeft = selectedItem.offsetLeft - scrollRef.current.offsetWidth / 2 + selectedItem.offsetWidth / 2;
+      }
+    }
+  }, [selectedMonth]);
+  const insightPct = pemasukan > 0 ? Math.round((totalPengeluaran / pemasukan) * 100) : 0;
+  const totalForChart = totalPengeluaran > 0 ? totalPengeluaran : 1;
+  const cx = 61.5;
+  const cy = 61.5;
+  const r = 54;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+  const segments = categoryData.slice(0, 10).map((cat, i) => {
+    const frac = cat.total / totalForChart;
+    const dashLen = frac * circumference;
+    const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+    const seg = { dashLen, offset, color, frac };
+    offset += dashLen;
+    return seg;
+  });
+  const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+  const leftPositions = [38, 84, 130, 176, 222, 268, 314, 360, 406, 452, 498, 544];
+  const visibleMonths = MONTH_LABELS.slice(0, 7);
+  const visibleLeft = leftPositions.slice(0, 7);
+  const catStartTop = 702;
+  const rowH = 44;
+
   return (
     <div className="bg-[#fdfdff] overflow-clip relative rounded-[30px] size-full" data-name="Recap Bulanan Januari">
       <Group9 />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[702px] w-[350px]" />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[834px] w-[350px]" />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[878px] w-[350px]" />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[922px] w-[350px]" />
-      <div className="absolute h-[24px] left-[36px] top-[930px] w-[25px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 15">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[586.08%] left-[-60.64%] max-w-none top-[-336.45%] w-[851.06%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
+
+      {/* ── Total Pengeluaran header card ── */}
+      <Group10 />
+      <Group34 monthName={monthName} year={year} totalPengeluaran={totalPengeluaran} />
+
+      {/* ── Horizontal month scroll bar ── */}
+      <div 
+        ref={scrollRef}
+        className="absolute bg-white rounded-[20px] shadow-[0px_0px_10px_1px_#eae1fe] recap-m-scroll"
+        style={{
+          height: 42, left: 21, top: 323, width: 350,
+          display: "flex", gap: 16, alignItems: "center", padding: "0 20px",
+          overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth"
+        }}
+      >
+        <style>{`.recap-m-scroll::-webkit-scrollbar{display:none}`}</style>
+        {MONTH_LABELS.map((label, i) => {
+          const mIdx = i + 1;
+          const isSelected = mIdx === selectedMonth;
+          return (
+            <button
+              key={label}
+              onClick={() => onSelectMonthQuick?.(mIdx)}
+              className="flex items-center justify-center flex-shrink-0 rounded-[10px] transition-colors"
+              style={{
+                width: 41,
+                height: 17,
+                background: isSelected ? "#eaa22c" : "transparent",
+                color: isSelected ? "white" : "black",
+                border: "none",
+                cursor: "pointer",
+                padding: 0
+              }}
+            >
+              <span className="font-['SF_Pro:Bold',sans-serif] font-bold text-[13px] leading-[normal]">{label}</span>
+            </button>
+          );
+        })}
       </div>
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[966px] w-[350px]" />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1009px] w-[350px]" />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1052px] w-[350px]" />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[1098px] w-[350px]" />
-      <div className="absolute h-[26px] left-[36px] top-[1061px] w-[25px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 16">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[567.38%] left-[-226.37%] max-w-none top-[-325.71%] w-[879.12%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="absolute left-[36px] size-[25px] top-[709px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 1">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[566.82%] left-[-60.52%] max-w-none top-[-147.02%] w-[849.87%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[715px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Makan / Minum</p>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[847px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Pendidikan</p>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[891px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Transportasi</p>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[935px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Pulsa / Data</p>
-      </div>
-      <div className="absolute h-[24px] left-[36px] top-[974px] w-[25px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 12">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[586.08%] left-[-373.4%] max-w-none top-[-154.03%] w-[851.06%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[979px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Pajak</p>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[1023px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Listrik</p>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[1067px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Kesehatan</p>
-      </div>
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[1111px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Lainnya</p>
-      </div>
-      <div className="absolute h-[27px] left-[36px] top-[1016px] w-[25px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 13">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[567.38%] left-[-577.01%] max-w-none top-[-143.79%] w-[919.54%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[715px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[847px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[891px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[935px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[979px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[1023px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[1067px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[1111px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[746px] w-[350px]" />
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[759px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Hiburan</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[759px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <Group7 />
-      <div className="-translate-x-1/2 absolute bg-white h-[39px] left-[calc(50%-0.5px)] rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] top-[790px] w-[350px]" />
-      <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[69px] text-[10px] text-black top-[803px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Perawatan Diri</p>
-      </div>
-      <div className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right top-[803px] w-[156px]" style={{ fontVariationSettings: '"wdth" 100' }}>
-        <p className="leading-[normal]">Rp 0</p>
-      </div>
-      <div className="absolute h-[24px] left-[36px] top-[798px] w-[25px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 8">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[592.59%] left-[-377.42%] max-w-none top-[-343.52%] w-[860.21%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="-translate-x-1/2 absolute bg-white h-[42px] left-[calc(50%+0.5px)] rounded-[20px] shadow-[0px_0px_10px_1px_#eae1fe] top-[323px] w-[350px]" />
-      <Group35 />
-      <div className="absolute left-[36px] size-[25px] top-[841px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 5">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[586.08%] left-[-709.89%] max-w-none top-[-154.03%] w-[879.12%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="absolute h-[24px] left-[36px] top-[754px] w-[25px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 9">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[592.59%] left-[-544.57%] max-w-none top-[-343.52%] w-[869.57%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <div className="absolute left-[36px] size-[25px] top-[1105px]" data-name="ChatGPT Image 14 Mei 2026, 14.28.49 14">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="" className="absolute h-[592.59%] left-[-717.78%] max-w-none top-[-343.52%] w-[888.89%]" src={imgChatGptImage14Mei202614284915} />
-        </div>
-      </div>
-      <Group13 />
-      <Group14 />
-      <Group15 />
-      <Group16 />
-      <Group17 />
-      <Group18 />
-      <Group19 />
-      <Group20 />
-      <Group21 />
-      <Group22 />
-      <div className="-translate-x-1/2 absolute bg-white h-[214px] left-1/2 rounded-[15px] shadow-[0px_0px_7px_1px_#ede8ff] top-[423px] w-[353px]" />
+
+      {/* ── Ringkasan Bulan Ini ── */}
+      <Group23 />
       <p className="[word-break:break-word] absolute font-['SF_Pro:Bold',sans-serif] font-bold leading-[normal] left-[50px] text-[13px] text-black top-[392px] whitespace-nowrap" style={{ fontVariationSettings: '"wdth" 100' }}>
         Ringkasan Bulan Ini
       </p>
-      <Group40 />
-      <Group23 />
-      <Group30 />
+      {/* White card background first */}
+      <div className="-translate-x-1/2 absolute bg-white h-[214px] left-1/2 rounded-[15px] shadow-[0px_0px_7px_1px_#ede8ff] top-[423px] w-[353px]" />
+
+      {/* Donut chart on top of card */}
+      <div className="-translate-x-1/2 absolute" style={{ left: "calc(50% - 90px)", top: 449, width: 123, height: 123 }}>
+        {categoryData.length > 0 ? (
+          <svg width="123" height="123" viewBox="0 0 123 123" fill="none">
+            {segments.map((seg, i) => (
+              <circle
+                key={i}
+                cx={cx}
+                cy={cy}
+                r={r}
+                fill="none"
+                stroke={CATEGORY_COLORS[i % CATEGORY_COLORS.length].fill}
+                strokeWidth="12"
+                strokeDasharray={`${seg.dashLen} ${circumference - seg.dashLen}`}
+                strokeDashoffset={-(seg.offset)}
+                transform={`rotate(-90 ${cx} ${cy})`}
+                strokeLinecap="butt"
+              />
+            ))}
+            <circle cx={cx} cy={cy} r={r - 7} fill="white" />
+          </svg>
+        ) : (
+          <svg width="123" height="123" viewBox="0 0 123 123" fill="none">
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e0e0e0" strokeWidth="12" />
+            <circle cx={cx} cy={cy} r={r - 7} fill="white" />
+          </svg>
+        )}
+      </div>
+
+      {/* Center label inside donut */}
+      <div
+        className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Black',sans-serif] font-[1000] h-[18px] justify-center leading-[0] text-[12px] text-black text-center"
+        style={{ left: 107, top: 505, width: 80, fontVariationSettings: '"wdth" 100' }}
+      >
+        <p className="leading-[normal]">Rp {(totalPengeluaran / 1000).toLocaleString("id-ID")}k</p>
+      </div>
+      <div
+        className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] h-[12px] justify-center leading-[0] text-[8px] text-center"
+        style={{ left: 106.92, top: 520.06, width: 50, color: "rgba(67,67,67,0.79)", fontVariationSettings: '"wdth" 100' }}
+      >
+        <p className="leading-[normal]">Pengeluaran</p>
+      </div>
+
+      {/* Pemasukan / Pengeluaran cards */}
+      <Group30 pemasukan={pemasukan} pengeluaran={totalPengeluaran} />
+
+      {/* Insight section */}
       <div className="-translate-x-1/2 absolute bg-[#f3f0fe] h-[37px] left-[calc(50%+0.5px)] rounded-[10px] top-[587px] w-[330px]" />
       <Group31 />
-      <Group32 />
+      <Group32 insightPct={insightPct} />
+
+      {/* ── Rincian Pengeluaran section ── */}
       <Group25 />
-      <Group10 />
-      <Group34 />
-      <div className="absolute h-[17px] left-[38px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-[#eaa22c] inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-center text-white" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Jan</p>
+
+      {/* Dynamic category list */}
+      {categoryData.slice(0, 10).map((cat, i) => {
+        const top = catStartTop + i * rowH;
+        const color = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+        return (
+          <div key={cat.nama}>
+            <div
+              className="absolute bg-white rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff]"
+              style={{ height: 39, left: 21, top, width: 350 }}
+            />
+            {/* Dynamic Icon (SVG) */}
+            <div
+              className="absolute"
+              style={{
+                left: 33,
+                top: top + 5.5,
+              }}
+            >
+              {getCategoryIcon(cat.nama)}
+            </div>
+            {/* Category name */}
+            <div
+              className="absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[70px] text-[10px] text-black w-[156px]"
+              style={{ top: top + 8, fontVariationSettings: '"wdth" 100' }}
+            >
+              <p className="leading-[normal]">{cat.nama}</p>
+            </div>
+            {/* Color badge (Percentage) */}
+            <div
+              className="absolute rounded-[3px] flex items-center justify-center font-['SF_Pro:Semibold',sans-serif] font-[590] text-[6px]"
+              style={{
+                width: 24,
+                height: 10,
+                left: 70,
+                top: top + 23,
+                background: color.pctBg,
+                color: color.pctColor,
+                fontVariationSettings: '"wdth" 100'
+              }}
+            >
+              {cat.pct}%
+            </div>
+            {/* Amount */}
+            <div
+              className="-translate-x-full -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['SF_Pro:Semibold',sans-serif] font-[590] h-[14px] justify-center leading-[0] left-[349px] text-[10px] text-black text-right w-[156px]"
+              style={{ top: top + 19.5, fontVariationSettings: '"wdth" 100' }}
+            >
+              <p className="leading-[normal]">Rp {cat.total.toLocaleString("id-ID")}</p>
+            </div>
+          </div>
+        );
+      })}
+
+      {categoryData.length === 0 && (
+        <div
+          className="absolute bg-white rounded-[20px] shadow-[0px_0px_3px_1px_#ede8ff] flex items-center justify-center"
+          style={{ height: 39, left: 21, top: catStartTop, width: 350 }}
+        >
+          <p className="text-[10px] text-gray-400">Tidak ada transaksi bulan ini</p>
         </div>
-      </div>
-      <div className="absolute h-[17px] left-[314px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-white inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Jul</p>
-        </div>
-      </div>
-      <div className="absolute h-[17px] left-[130px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-white inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Mar</p>
-        </div>
-      </div>
-      <div className="absolute h-[17px] left-[84px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-white inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Feb</p>
-        </div>
-      </div>
-      <div className="absolute h-[17px] left-[176px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-white inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Apr</p>
-        </div>
-      </div>
-      <div className="absolute h-[17px] left-[222px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-white inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Mei</p>
-        </div>
-      </div>
-      <div className="absolute h-[17px] left-[268px] top-[337px] w-[41px]" data-name="Bulan1">
-        <div className="absolute bg-white inset-0 rounded-[10px]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['SF_Pro:Bold',sans-serif] font-bold inset-[0_16.57%_17.65%_14.41%] justify-center leading-[0] text-[13px] text-black text-center" style={{ fontVariationSettings: '"wdth" 100' }}>
-          <p className="leading-[normal]">Jun</p>
-        </div>
-      </div>
-      <Group36 />
+      )}
     </div>
   );
 }

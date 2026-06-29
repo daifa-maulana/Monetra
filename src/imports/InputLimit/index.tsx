@@ -431,13 +431,35 @@ export default function InputLimit({
     try {
       setSaving(true);
       
-      // Update limit_pengeluaran in rekening table
-      const { error } = await supabase
+      // 1. Fetch current row
+      const { data, error: fetchErr } = await supabase
         .from("rekening")
-        .update({ limit_pengeluaran: amountNum })
-        .eq("user_id", userId);
+        .select("id")
+        .eq("user_id", userId)
+        .limit(1);
 
-      if (error) throw error;
+      if (fetchErr) throw fetchErr;
+
+      if (data && data.length > 0) {
+        // 2. Update limit_pengeluaran in rekening table
+        const { error: updateErr } = await supabase
+          .from("rekening")
+          .update({ limit_pengeluaran: amountNum })
+          .eq("user_id", userId);
+        if (updateErr) throw updateErr;
+      } else {
+        // 2. Insert new row
+        const { error: insertErr } = await supabase
+          .from("rekening")
+          .insert({
+            user_id: userId,
+            limit_pengeluaran: amountNum,
+            nama: "Dompet Utama",
+            saldo: 0
+          });
+        if (insertErr) throw insertErr;
+      }
+
       onBack();
     } catch (err) {
       console.error("Error saving limit:", err);
